@@ -1,21 +1,52 @@
 # Open Speech ASR
 
-Open Speech ASR is a macOS native dictation app forked from the previous OpenSpeech/FreeFlow codebase.
+Open Speech ASR is a native macOS menu bar dictation app. It uses a Swift
+Qwen3-ASR pipeline for local speech recognition and can apply local Gemma E4B
+text cleanup after transcription.
 
-The default mode replaces the Python SenseVoice ASR path with Swift-native Qwen3-ASR while keeping local Gemma E4B for prompt-based correction:
+The current public baseline is tagged `appstore-submitted-2026-06-16`. Ongoing
+App Store review remediation work lives on
+`appstore-review-fix/nonpublic-api`.
 
-- ASR runs in the Swift process through `speech-swift` `Qwen3ASR`.
-- Text cleanup runs through the bundled local Gemma E4B backend, so prompt presets and custom vocabulary apply after recognition.
-- The bundled model is `aufklarer/Qwen3-ASR-1.7B-MLX-4bit`.
-- The packaged app includes the local model under `Contents/Resources/qwen3-asr-1.7b-4bit`.
-- In the default mode, Python starts only for Gemma correction and skips loading SenseVoice ASR.
-- `第三方 API` mode does not start the Python backend.
+## Highlights
+
+- Native macOS app built with SwiftUI and Swift Package Manager.
+- Local Qwen3-ASR recognition through `speech-swift` and `Qwen3ASR`.
+- Optional local Gemma E4B correction for prompt presets, custom vocabulary,
+  output language, and cleanup.
+- Legacy `SenseVoice + Gemma E4B` mode remains available for compatibility.
+- OpenAI-compatible third-party API mode can run without starting the local
+  Python backend.
+- Packaged builds include the Qwen3-ASR model under
+  `Contents/Resources/qwen3-asr-1.7b-4bit`.
+- The release build precompiles `mlx.metallib` so MLX avoids slow first-use
+  shader compilation.
 
 ## Engine Modes
 
-- `Qwen3-ASR + Gemma E4B`: default first-run mode. Loads the bundled Qwen3-ASR model in Swift, then uses local Gemma E4B for prompt presets, correction, output language, and custom vocabulary.
-- `SenseVoice + Gemma E4B`: starts the bundled Python backend, exposes `/asr` and `/polish`, and waits for both `asrLoaded` and `modelLoaded`.
-- `第三方 API`: uses the OpenAI-compatible API settings for audio transcription and LLM post-processing. Local Python/Gemma stays off.
+`Qwen3-ASR + Gemma E4B` is the default mode. ASR runs in the Swift process, then
+the bundled local Gemma backend performs optional prompt-based cleanup.
+
+`SenseVoice + Gemma E4B` starts the bundled Python backend and exposes both ASR
+and polish endpoints. It is the legacy local mode.
+
+`第三方 API` uses OpenAI-compatible transcription and chat settings. The local
+Python/Gemma backend stays off in this mode.
+
+## Repository Layout
+
+```text
+Sources/        SwiftUI app, transcription pipeline, settings, and providers
+backend/        Bundled Python backend for Gemma correction and legacy SenseVoice
+Resources/      App icons and shared bundled resources
+scripts/        Build, QA, state reset, and GitHub sync helpers
+website/        Static landing-page assets
+Makefile        Build, packaging, signing, notarization, and run targets
+```
+
+Build outputs, SwiftPM build state, App Store Connect keys, certificates, and
+provisioning profiles must not be committed. The repository intentionally keeps
+`build/`, `.build`, `.DS_Store`, Python caches, and `.env` out of Git.
 
 ## Build
 
@@ -23,15 +54,17 @@ The default mode replaces the Python SenseVoice ASR path with Swift-native Qwen3
 make all
 ```
 
-The build uses SwiftPM, then precompiles MLX Metal shaders into `mlx.metallib` and copies it next to the app executable. Do not skip this step: without the precompiled Metal library, MLX can fall back to runtime shader compilation and Qwen3-ASR inference becomes much slower.
+The build uses SwiftPM, precompiles MLX Metal shaders into `mlx.metallib`,
+copies the app executable into `build/Open Speech ASR.app`, bundles the local
+ASR model, bundles the optional Gemma backend, and signs the app.
 
-The default model source is:
+The default Qwen3-ASR model source is:
 
 ```text
 /Users/paco/Documents/LLM-Models/Qwen3-ASR-1.7B-4bit
 ```
 
-Override it with:
+Override it when needed:
 
 ```bash
 make all QWEN3_ASR_MODEL_SOURCE=/path/to/Qwen3-ASR-1.7B-4bit
@@ -43,19 +76,73 @@ make all QWEN3_ASR_MODEL_SOURCE=/path/to/Qwen3-ASR-1.7B-4bit
 make dmg
 ```
 
-The DMG build resets local app state first for first-run QA, stages `Open Speech ASR.app`, includes an Applications alias, and signs the app. Set `CODESIGN_IDENTITY` and `NOTARIZE_PROFILE` for Developer ID distribution.
+The DMG target resets local app state, stages `Open Speech ASR.app`, adds an
+Applications alias, and signs the app. Set `CODESIGN_IDENTITY` and
+`NOTARIZE_PROFILE` for Developer ID distribution and notarization:
+
+```bash
+make notarize \
+  CODESIGN_IDENTITY="Developer ID Application: Example (TEAMID)" \
+  NOTARIZE_PROFILE="notarytool-profile"
+```
 
 ## Validation
 
-The helper target below runs Qwen3-ASR against a real audio file using an explicit local model directory:
+Run a release Swift build:
+
+```bash
+swift build -c release --disable-sandbox
+```
+
+Run ASR smoke tests against a local model:
 
 ```bash
 swift build -c release --product asr-smoke-test --disable-sandbox
 .build/release/asr-smoke-test path/to/audio.aiff /Users/paco/Documents/LLM-Models/Qwen3-ASR-1.7B-4bit zh
 ```
 
-The same helper can point at the bundled app model:
+Run the same helper against a bundled app model:
 
 ```bash
-.build/release/asr-smoke-test path/to/audio.aiff "build/Open Speech ASR.app/Contents/Resources/qwen3-asr-1.7b-4bit" en
+.build/release/asr-smoke-test \
+  path/to/audio.aiff \
+  "build/Open Speech ASR.app/Contents/Resources/qwen3-asr-1.7b-4bit" \
+  en
 ```
+
+Verify signed artifacts:
+
+```bash
+codesign --verify --deep --strict --verbose=2 "build/Open Speech ASR.app"
+hdiutil verify "build/Open Speech ASR.dmg"
+```
+
+## GitHub Sync
+
+The canonical remote is:
+
+```text
+https://github.com/PacoZhou1/open-speech-asr
+```
+
+For this local checkout, automatic GitHub sync can be installed with:
+
+```bash
+scripts/install_auto_sync_hook.sh
+```
+
+The hook runs after each commit and pushes the current branch plus tags to
+`origin`. Manual sync is also available:
+
+```bash
+scripts/sync_to_github.sh
+```
+
+The hook only pushes committed Git objects. It does not stage or commit local
+changes, and it does not upload ignored build output or secret files.
+
+## Current GitHub Baseline
+
+- `main`: App Store submission baseline.
+- `appstore-submitted-2026-06-16`: tag for the submitted build baseline.
+- `appstore-review-fix/nonpublic-api`: current App Store review fix branch.
