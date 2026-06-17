@@ -51,6 +51,7 @@ $(APP_EXECUTABLE): Info.plist $(ICON_ICNS) swift-build shader
 	@plutil -replace CFBundleIdentifier -string "$(BUNDLE_ID)" "$(CONTENTS)/Info.plist"
 	@plutil -replace CFBundleShortVersionString -string "$(MARKETING_VERSION)" "$(CONTENTS)/Info.plist"
 	@plutil -replace CFBundleVersion -string "$(BUILD_VERSION)" "$(CONTENTS)/Info.plist"
+	@plutil -replace LSApplicationCategoryType -string "public.app-category.productivity" "$(CONTENTS)/Info.plist"
 	@plutil -replace LSMinimumSystemVersion -string "15.0" "$(CONTENTS)/Info.plist"
 	@cp $(ICON_ICNS) "$(RESOURCES)/AppIcon.icns"
 	@plutil -replace NSMicrophoneUsageDescription -string "$(APP_NAME) needs microphone access to transcribe your speech." "$(CONTENTS)/Info.plist"
