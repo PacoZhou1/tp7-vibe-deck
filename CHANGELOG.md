@@ -1,12 +1,46 @@
 # Changelog
 
-All notable changes to FreeFlow are documented here.
+All notable changes to Open Speech ASR are documented here.
 
 This project uses semantic versioning for public releases. Use `MAJOR.MINOR.PATCH`, where:
 
 - `MAJOR` changes include breaking behavior or major compatibility changes.
 - `MINOR` changes add user-visible features and improvements.
 - `PATCH` changes fix bugs, polish existing behavior, or make small internal improvements.
+
+## [1.0.1] - 2026-06-17
+
+### Added
+
+- Published the private GitHub repository at `PacoZhou1/open-speech-asr`.
+- Added a documented GitHub sync workflow for this local checkout.
+
+### Changed
+
+- Rebranded the app documentation from the inherited FreeFlow codebase to Open
+  Speech ASR.
+- Documented the current native Qwen3-ASR + local Gemma E4B pipeline, engine
+  modes, packaging path, validation commands, and GitHub baseline refs.
+
+### Fixed
+
+- Removed deprecated Carbon API references from the App Store review fix branch.
+
+## [1.0.0] - 2026-06-16
+
+### Added
+
+- Tagged the App Store submission baseline as `appstore-submitted-2026-06-16`.
+- Switched the default local ASR path to native Swift Qwen3-ASR.
+- Bundled `aufklarer/Qwen3-ASR-1.7B-MLX-4bit` under the app resources.
+- Kept local Gemma E4B as the correction and prompt-processing backend.
+
+### Changed
+
+- Split engine modes into `Qwen3-ASR + Gemma E4B`,
+  `SenseVoice + Gemma E4B`, and `第三方 API`.
+- Gated Python backend startup by engine mode so third-party API mode does not
+  start the local backend.
 
 ## [0.3.3] - 2026-04-25
 
