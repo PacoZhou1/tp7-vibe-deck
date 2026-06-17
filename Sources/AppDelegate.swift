@@ -75,7 +75,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             showSetupWindow()
         } else {
             appState.startHotkeyMonitoring()
-            appState.startAccessibilityPolling()
+            appState.startPermissionPolling()
             if !appState.hasCompletedOnboarding {
                 showOnboardingWindow(markCompletedOnClose: true)
             }
@@ -110,7 +110,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         let wasCompleted = appState.hasCompletedSetup
         appState.hasCompletedSetup = false
-        appState.stopAccessibilityPolling()
+        appState.stopPermissionPolling()
         appState.stopHotkeyMonitoring()
         showSetupWindow()
 
@@ -127,7 +127,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 if !self.appState.hasCompletedSetup {
                     self.appState.hasCompletedSetup = true
                     self.appState.startHotkeyMonitoring()
-                    self.appState.startAccessibilityPolling()
+                    self.appState.startPermissionPolling()
                     NSApp.setActivationPolicy(.accessory)
                 }
                 self.setupWindow = nil
@@ -285,7 +285,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         setupWindow = nil
         NSApp.setActivationPolicy(.accessory)
         appState.startHotkeyMonitoring()
-        appState.startAccessibilityPolling()
+        appState.startPermissionPolling()
         if !appState.hasCompletedOnboarding {
             showOnboardingWindow(markCompletedOnClose: true)
         }

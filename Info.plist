@@ -26,8 +26,6 @@
     <string>Open Speech ASR needs microphone access to transcribe your speech.</string>
     <key>NSSpeechRecognitionUsageDescription</key>
     <string>Open Speech ASR needs speech recognition to convert your voice to text.</string>
-    <key>NSAccessibilityUsageDescription</key>
-    <string>Open Speech ASR needs accessibility access to detect the text cursor position and paste transcribed text.</string>
     <key>NSInputMonitoringUsageDescription</key>
     <string>Open Speech ASR needs input monitoring to detect global dictation shortcuts while you use other apps.</string>
 </dict>

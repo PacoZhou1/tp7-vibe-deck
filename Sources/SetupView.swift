@@ -1,6 +1,7 @@
 import SwiftUI
 import AVFoundation
 import Combine
+import CoreGraphics
 import Foundation
 import ServiceManagement
 
@@ -104,7 +105,7 @@ struct SetupView: View {
         case welcome = 0
         case apiKey
         case micPermission
-        case accessibility
+        case inputMonitoring
         case screenRecording
         case holdShortcut
         case toggleShortcut
@@ -117,7 +118,7 @@ struct SetupView: View {
 
     @State private var currentStep = SetupStep.welcome
     @State private var micPermissionGranted = false
-    @State private var accessibilityGranted = false
+    @State private var inputMonitoringGranted = false
     @State private var apiKeyInput: String = ""
     @State private var apiBaseURLInput: String = ""
     @State private var transcriptionAPIURLInput: String = ""
@@ -125,7 +126,7 @@ struct SetupView: View {
     @State private var isValidatingKey = false
     @State private var keyValidationError: String?
     @State private var showingProviderSettingsSheet = false
-    @State private var accessibilityTimer: Timer?
+    @State private var inputMonitoringTimer: Timer?
     @State private var screenRecordingTimer: Timer?
     @State private var customVocabularyInput: String = ""
     @StateObject private var githubCache = GitHubMetadataCache.shared
@@ -241,13 +242,13 @@ struct SetupView: View {
             transcriptionAPIKeyInput = appState.transcriptionAPIKey
             customVocabularyInput = appState.customVocabulary
             checkMicPermission()
-            checkAccessibility()
+            checkInputMonitoring()
             Task {
                 await githubCache.fetchIfNeeded()
             }
         }
         .onDisappear {
-            accessibilityTimer?.invalidate()
+            inputMonitoringTimer?.invalidate()
             screenRecordingTimer?.invalidate()
             appState.resumeHotkeyMonitoringAfterShortcutCapture()
         }
@@ -278,8 +279,8 @@ struct SetupView: View {
             apiKeyStep
         case .micPermission:
             micPermissionStep
-        case .accessibility:
-            accessibilityStep
+        case .inputMonitoring:
+            inputMonitoringStep
         case .screenRecording:
             screenRecordingStep
         case .holdShortcut:
@@ -553,35 +554,35 @@ struct SetupView: View {
         }
     }
 
-    var accessibilityStep: some View {
+    var inputMonitoringStep: some View {
         VStack(spacing: 20) {
-            Image(systemName: "hand.raised.fill")
+            Image(systemName: "keyboard.fill")
                 .font(.system(size: 60))
                 .foregroundStyle(.blue)
 
-            Text("Accessibility Access")
+            Text("Input Monitoring")
                 .font(.title)
                 .fontWeight(.bold)
 
-            Text("\(AppName.displayName) needs Accessibility access to paste transcribed text into your apps.")
+            Text("\(AppName.displayName) needs Input Monitoring access to detect global shortcuts while you use other apps.")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
             HStack {
-                Image(systemName: "hand.raised.fill")
+                Image(systemName: "keyboard.fill")
                     .frame(width: 24)
                     .foregroundStyle(.blue)
-                Text("Accessibility")
+                Text("Input Monitoring")
                 Spacer()
-                if accessibilityGranted {
+                if inputMonitoringGranted {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(.green)
                     Text("Granted")
                         .foregroundStyle(.green)
                 } else {
                     Button("Open Settings") {
-                        requestAccessibility()
+                        requestInputMonitoring()
                     }
                 }
             }
@@ -591,10 +592,10 @@ struct SetupView: View {
 
         }
         .onAppear {
-            startAccessibilityPolling()
+            startInputMonitoringPolling()
         }
         .onDisappear {
-            accessibilityTimer?.invalidate()
+            inputMonitoringTimer?.invalidate()
         }
     }
 
@@ -1037,7 +1038,7 @@ struct SetupView: View {
                         )
                     }
                 }
-                HowToRow(icon: "doc.on.clipboard", text: "Text is typed at your cursor & copied")
+                HowToRow(icon: "doc.on.clipboard", text: "Text is copied to the clipboard")
             }
             .padding(.top, 10)
 
@@ -1058,8 +1059,8 @@ struct SetupView: View {
         switch currentStep {
         case .micPermission:
             return micPermissionGranted
-        case .accessibility:
-            return accessibilityGranted
+        case .inputMonitoring:
+            return inputMonitoringGranted
         case .screenRecording:
             return appState.hasScreenRecordingPermission
         case .testTranscription:
@@ -1158,21 +1159,23 @@ struct SetupView: View {
         }
     }
 
-    func checkAccessibility() {
-        accessibilityGranted = AXIsProcessTrusted()
+    func checkInputMonitoring() {
+        inputMonitoringGranted = CGPreflightListenEventAccess()
+        appState.hasKeyboardMonitoringPermission = inputMonitoringGranted
     }
 
-    func startAccessibilityPolling() {
-        accessibilityTimer?.invalidate()
-        accessibilityTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+    func startInputMonitoringPolling() {
+        inputMonitoringTimer?.invalidate()
+        inputMonitoringTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
             DispatchQueue.main.async {
-                checkAccessibility()
+                checkInputMonitoring()
             }
         }
     }
 
-    func requestAccessibility() {
-        appState.openAccessibilitySettings()
+    func requestInputMonitoring() {
+        appState.requestKeyboardMonitoringAccess()
+        checkInputMonitoring()
     }
 
     func startScreenRecordingPolling() {

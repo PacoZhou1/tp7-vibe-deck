@@ -1,6 +1,5 @@
 import SwiftUI
 import AVFoundation
-import ApplicationServices
 import CoreGraphics
 import Combine
 
@@ -10,7 +9,6 @@ struct OnboardingView: View {
     @EnvironmentObject private var appState: AppState
     @State private var currentStep: OnboardingStep = .menuBar
     @State private var micPermissionGranted = false
-    @State private var accessibilityTimer: Timer?
     @State private var permissionTimer: Timer?
     @State private var testPhase: OnboardingTestPhase = .idle
     @State private var testAudioRecorder: AudioRecorder?
@@ -41,7 +39,7 @@ struct OnboardingView: View {
         var subtitle: String {
             switch self {
             case .menuBar: return "OPEN SPEECH 常驻在顶部菜单栏，不会显示 Dock 主窗口。"
-            case .permissions: return "麦克风用于录音，辅助功能用于把文字粘贴回当前 App。"
+            case .permissions: return "麦克风用于录音，键盘监听用于在其他 App 中响应全局快捷键。"
             case .shortcuts: return "建议保留一个长按快捷键和一个点击开关，后续可以随时改。"
             case .test: return "说一句话，确认麦克风、模型和转录链路都工作正常。"
             case .ready: return "之后只需要按快捷键，或者从顶部菜单栏开始录音。"
@@ -67,7 +65,7 @@ struct OnboardingView: View {
     private var canAdvance: Bool {
         switch currentStep {
         case .permissions:
-            return micPermissionGranted && appState.hasAccessibility && appState.hasKeyboardMonitoringPermission
+            return micPermissionGranted && appState.hasKeyboardMonitoringPermission
         case .test:
             return testPhase == .done && testError == nil && !testTranscript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         default:
@@ -249,18 +247,6 @@ struct OnboardingView: View {
             )
 
             permissionCard(
-                title: "辅助功能",
-                detail: "必须开启。用于把转录后的文字粘贴到当前输入框。",
-                icon: "hand.raised.fill",
-                granted: appState.hasAccessibility,
-                required: true,
-                actionTitle: "打开系统设置",
-                action: {
-                    appState.openAccessibilitySettings()
-                }
-            )
-
-            permissionCard(
                 title: "键盘监听",
                 detail: "必须开启。用于在其他 App 中响应全局快捷键。",
                 icon: "keyboard.fill",
@@ -285,7 +271,7 @@ struct OnboardingView: View {
             )
 
             if !canAdvance {
-                Label("至少完成麦克风和辅助功能授权后，再继续测试转录。", systemImage: "exclamationmark.triangle.fill")
+                Label("至少完成麦克风和键盘监听授权后，再继续测试转录。", systemImage: "exclamationmark.triangle.fill")
                     .font(.caption)
                     .foregroundStyle(.orange)
                     .padding(.top, 4)
@@ -557,7 +543,6 @@ struct OnboardingView: View {
 
     private func refreshPermissions() {
         micPermissionGranted = AVCaptureDevice.authorizationStatus(for: .audio) == .authorized
-        appState.hasAccessibility = AXIsProcessTrusted()
         appState.hasScreenRecordingPermission = CGPreflightScreenCaptureAccess()
         appState.hasKeyboardMonitoringPermission = CGPreflightListenEventAccess()
     }
@@ -572,8 +557,6 @@ struct OnboardingView: View {
     }
 
     private func stopPermissionPolling() {
-        accessibilityTimer?.invalidate()
-        accessibilityTimer = nil
         permissionTimer?.invalidate()
         permissionTimer = nil
     }

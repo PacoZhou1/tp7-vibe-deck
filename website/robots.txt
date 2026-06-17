@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://freeflow.zachlatta.com/sitemap.xml
+Sitemap: https://pacozhou1.github.io/open-speech-asr/sitemap.xml

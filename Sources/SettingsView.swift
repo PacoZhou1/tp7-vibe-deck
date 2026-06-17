@@ -330,9 +330,9 @@ struct GeneralSettingsView: View {
                     icon: "mic.fill"
                 )
                 onboardingStatusPill(
-                    title: "辅助功能",
-                    granted: appState.hasAccessibility,
-                    icon: "hand.raised.fill"
+                    title: "键盘监听",
+                    granted: appState.hasKeyboardMonitoringPermission,
+                    icon: "keyboard"
                 )
                 onboardingStatusPill(
                     title: "快捷键",
@@ -917,20 +917,12 @@ struct GeneralSettingsView: View {
 
     private var clipboardSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Toggle("粘贴后恢复剪贴板内容", isOn: $appState.preserveClipboard)
-
-            Text("OPEN SPEECH 会临时将文本放到剪贴板以完成粘贴，随后恢复之前的内容。如果在恢复前你复制了其他内容，则不会覆盖。")
+            Text("OPEN SPEECH 会在转写完成后把文本复制到剪贴板。需要输入到其他 App 时，请手动使用 Command-V。")
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
             Divider()
                 .padding(.vertical, 2)
-
-            Toggle("说\"回车\"来在粘贴后确认提交", isOn: $appState.isPressEnterVoiceCommandEnabled)
-
-            Text("当转录以\"回车\"结尾时，OPEN SPEECH 会在清理前移除这些词，粘贴剩余文本后自动按下回车键。")
-                .font(.caption)
-                .foregroundStyle(.secondary)
         }
     }
 
@@ -1050,15 +1042,6 @@ struct GeneralSettingsView: View {
                     appState.requestMicrophoneAccess { granted in
                         micPermissionGranted = granted
                     }
-                }
-            )
-
-            permissionRow(
-                title: "Accessibility",
-                icon: "hand.raised.fill",
-                granted: appState.hasAccessibility,
-                action: {
-                    appState.openAccessibilitySettings()
                 }
             )
 
@@ -2240,7 +2223,7 @@ struct VoiceMacrosSettingsView: View {
     private var macrosSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Bypass post-processing and immediately paste your predefined text.")
+                    Text("Bypass post-processing and immediately copy your predefined text.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Spacer()
@@ -2322,7 +2305,7 @@ struct VoiceMacroEditorView: View {
                 TextField("e.g. debugging prompt", text: $command)
                     .textFieldStyle(.roundedBorder)
 
-                Text("Text (What gets pasted)")
+                Text("Text (What gets copied)")
                     .font(.caption.weight(.semibold))
                     .padding(.top, 8)
                 TextEditor(text: $payload)

@@ -1,5 +1,4 @@
 import Foundation
-import ApplicationServices
 import AppKit
 
 struct AppSelectionSnapshot {
@@ -78,12 +77,11 @@ Return only two sentences, no labels, no markdown, no extra commentary.
             )
         }
 
-        let appElement = AXUIElementCreateApplication(frontmostApp.processIdentifier)
         return AppSelectionSnapshot(
             appName: frontmostApp.localizedName,
             bundleIdentifier: frontmostApp.bundleIdentifier,
-            windowTitle: focusedWindowTitle(from: appElement) ?? frontmostApp.localizedName,
-            selectedText: rawSelectedText(from: appElement)
+            windowTitle: frontmostApp.localizedName,
+            selectedText: nil
         )
     }
 
@@ -107,13 +105,10 @@ Return only two sentences, no labels, no markdown, no extra commentary.
 
         let appName = frontmostApp.localizedName
         let bundleIdentifier = frontmostApp.bundleIdentifier
-        let appElement = AXUIElementCreateApplication(frontmostApp.processIdentifier)
-
-        let windowTitle = focusedWindowTitle(from: appElement) ?? appName
-        let selectedText = selectedText(from: appElement)
+        let windowTitle = appName
+        let selectedText: String? = nil
         let screenshot = captureActiveWindowScreenshot(
             processIdentifier: frontmostApp.processIdentifier,
-            appElement: appElement,
             focusedWindowTitle: windowTitle
         )
         let currentActivity: String
@@ -311,102 +306,8 @@ Selected text: \(selectedText ?? "None")
         return "Could not reliably infer a two-sentence summary for \(activeApp) from the visible metadata."
     }
 
-    private func focusedWindowTitle(from appElement: AXUIElement) -> String? {
-        guard let focusedWindow = accessibilityElement(from: appElement, attribute: kAXFocusedWindowAttribute as CFString) else {
-            return nil
-        }
-
-        if let windowTitle = accessibilityString(from: focusedWindow, attribute: kAXTitleAttribute as CFString) {
-            return trimmedText(windowTitle)
-        }
-
-        return nil
-    }
-
-    private func selectedText(from appElement: AXUIElement) -> String? {
-        if let focusedElement = accessibilityElement(from: appElement, attribute: kAXFocusedUIElementAttribute as CFString),
-           let selectedText = accessibilityString(from: focusedElement, attribute: kAXSelectedTextAttribute as CFString) {
-            return trimmedText(selectedText)
-        }
-
-        if let selectedText = accessibilityString(from: appElement, attribute: kAXSelectedTextAttribute as CFString) {
-            return trimmedText(selectedText)
-        }
-
-        return nil
-    }
-
-    private func rawSelectedText(from appElement: AXUIElement) -> String? {
-        if let focusedElement = accessibilityElement(from: appElement, attribute: kAXFocusedUIElementAttribute as CFString),
-           let selectedText = accessibilityRawString(from: focusedElement, attribute: kAXSelectedTextAttribute as CFString) {
-            return selectedText
-        }
-
-        if let selectedText = accessibilityRawString(from: appElement, attribute: kAXSelectedTextAttribute as CFString) {
-            return selectedText
-        }
-
-        return nil
-    }
-
-    private func accessibilityElement(from element: AXUIElement, attribute: CFString) -> AXUIElement? {
-        var value: CFTypeRef?
-        let result = AXUIElementCopyAttributeValue(element, attribute, &value)
-        guard result == .success,
-              let rawValue = value,
-              CFGetTypeID(rawValue) == AXUIElementGetTypeID() else {
-            return nil
-        }
-        return unsafeBitCast(rawValue, to: AXUIElement.self)
-    }
-
-    private func accessibilityString(from element: AXUIElement, attribute: CFString) -> String? {
-        var value: CFTypeRef?
-        let result = AXUIElementCopyAttributeValue(element, attribute, &value)
-        guard result == .success, let stringValue = value as? String else { return nil }
-        return trimmedText(stringValue)
-    }
-
-    private func accessibilityRawString(from element: AXUIElement, attribute: CFString) -> String? {
-        var value: CFTypeRef?
-        let result = AXUIElementCopyAttributeValue(element, attribute, &value)
-        guard result == .success, let stringValue = value as? String else { return nil }
-        return stringValue.isEmpty ? nil : stringValue
-    }
-
-    private func accessibilityPoint(from element: AXUIElement, attribute: CFString) -> CGPoint? {
-        var value: CFTypeRef?
-        let result = AXUIElementCopyAttributeValue(element, attribute, &value)
-        guard result == .success,
-              let rawValue = value,
-              CFGetTypeID(rawValue) == AXValueGetTypeID() else {
-            return nil
-        }
-
-        let axValue = unsafeBitCast(rawValue, to: AXValue.self)
-        var point = CGPoint.zero
-        guard AXValueGetValue(axValue, .cgPoint, &point) else { return nil }
-        return point
-    }
-
-    private func accessibilitySize(from element: AXUIElement, attribute: CFString) -> CGSize? {
-        var value: CFTypeRef?
-        let result = AXUIElementCopyAttributeValue(element, attribute, &value)
-        guard result == .success,
-              let rawValue = value,
-              CFGetTypeID(rawValue) == AXValueGetTypeID() else {
-            return nil
-        }
-
-        let axValue = unsafeBitCast(rawValue, to: AXValue.self)
-        var size = CGSize.zero
-        guard AXValueGetValue(axValue, .cgSize, &size) else { return nil }
-        return size
-    }
-
     private func captureActiveWindowScreenshot(
         processIdentifier: pid_t,
-        appElement: AXUIElement,
         focusedWindowTitle: String?
     ) -> (dataURL: String?, mimeType: String?, error: String?) {
         if !CGPreflightScreenCaptureAccess() {
@@ -462,66 +363,56 @@ Selected text: \(selectedText ?? "None")
             )
         }
 
-        if let focusedWindowBounds = focusedWindowBounds(from: appElement), !focusedWindowBounds.isNull {
-            if let activeWindow = candidateWindows
-                .compactMap({ candidate -> (CandidateWindow, CGFloat)? in
-                    guard let candidateBounds = candidate.bounds else { return nil }
-                    let intersection = candidateBounds.intersection(focusedWindowBounds)
-                    guard !intersection.isNull else { return nil }
-                    let overlap = intersection.width * intersection.height
-                    return (candidate, overlap)
-                })
-                .sorted(by: { lhs, rhs in
-                    if lhs.0.layer == rhs.0.layer {
-                        return lhs.1 > rhs.1
-                    }
-                    return lhs.0.layer < rhs.0.layer
-                })
-                    .first?.0 {
-                if let dataURL = captureWindowImage(
-                    windowID: activeWindow.id,
-                    fileType: .jpeg,
-                    mimeType: "image/jpeg",
-                    compression: screenshotCompressionPrimary,
-                    maxDimension: screenshotMaxDimension
-                ) {
-                    return (dataURL, "image/jpeg", nil)
-                }
-            }
+        if let focusedWindowTitle,
+           let activeWindow = candidateWindows
+               .filter({ candidate in
+                   let normalizedName = candidate.name?
+                       .lowercased()
+                       .trimmingCharacters(in: .whitespacesAndNewlines)
+                   let normalizedTarget = focusedWindowTitle
+                       .lowercased()
+                       .trimmingCharacters(in: .whitespacesAndNewlines)
+                   guard let normalizedName, !normalizedName.isEmpty,
+                         !normalizedTarget.isEmpty else {
+                       return false
+                   }
 
-            if let focusedWindowTitle,
-               let activeWindow = candidateWindows
-                   .filter({ candidate in
-                       let normalizedName = candidate.name?
-                           .lowercased()
-                           .trimmingCharacters(in: .whitespacesAndNewlines)
-                       let normalizedTarget = focusedWindowTitle
-                           .lowercased()
-                           .trimmingCharacters(in: .whitespacesAndNewlines)
-                       guard let normalizedName, !normalizedName.isEmpty,
-                             !normalizedTarget.isEmpty else {
-                           return false
-                       }
-
-                       return normalizedName == normalizedTarget || normalizedName.contains(normalizedTarget)
-                   })
-                   .sorted(by: { lhs, rhs in
-                       if lhs.layer == rhs.layer {
-                           return lhs.area > rhs.area
-                       }
-                       return lhs.layer < rhs.layer
-                   })
-                   .first {
-                if let dataURL = captureWindowImage(
-                    windowID: activeWindow.id,
-                    fileType: .jpeg,
-                    mimeType: "image/jpeg",
-                    compression: screenshotCompressionPrimary,
-                    maxDimension: screenshotMaxDimension
-                ) {
-                    return (dataURL, "image/jpeg", nil)
-                }
+                   return normalizedName == normalizedTarget || normalizedName.contains(normalizedTarget)
+               })
+               .sorted(by: { lhs, rhs in
+                   if lhs.layer == rhs.layer {
+                       return lhs.area > rhs.area
+                   }
+                   return lhs.layer < rhs.layer
+               })
+               .first {
+            if let dataURL = captureWindowImage(
+                windowID: activeWindow.id,
+                fileType: .jpeg,
+                mimeType: "image/jpeg",
+                compression: screenshotCompressionPrimary,
+                maxDimension: screenshotMaxDimension
+            ) {
+                return (dataURL, "image/jpeg", nil)
             }
+        }
+
+        if let activeWindow = candidateWindows
+            .sorted(by: { lhs, rhs in
+                if lhs.layer == rhs.layer {
+                    return lhs.area > rhs.area
+                }
+                return lhs.layer < rhs.layer
+            })
+            .first,
+           let dataURL = captureWindowImage(
+               windowID: activeWindow.id,
+               fileType: .jpeg,
+               mimeType: "image/jpeg",
+               compression: screenshotCompressionPrimary,
+               maxDimension: screenshotMaxDimension
+           ) {
+            return (dataURL, "image/jpeg", nil)
         }
 
         return (nil, nil, "Screenshot capture requires ScreenCaptureKit on macOS 15+")
@@ -557,19 +448,6 @@ Selected text: \(selectedText ?? "None")
         }
 
         return CGRect(x: x, y: y, width: width, height: height)
-    }
-
-    private func focusedWindowBounds(from appElement: AXUIElement) -> CGRect? {
-        guard let focusedWindow = accessibilityElement(
-            from: appElement,
-            attribute: kAXFocusedWindowAttribute as CFString
-        ),
-              let point = accessibilityPoint(from: focusedWindow, attribute: kAXPositionAttribute as CFString),
-              let size = accessibilitySize(from: focusedWindow, attribute: kAXSizeAttribute as CFString) else {
-            return nil
-        }
-
-        return CGRect(origin: point, size: size)
     }
 
     private func convertImageToDataURL(

@@ -2,7 +2,7 @@ APP_NAME ?= Open Speech ASR
 EXECUTABLE_NAME ?= OpenSpeechASR
 BUNDLE_ID ?= com.openspeech.asr
 MARKETING_VERSION ?= 1.0
-BUILD_VERSION ?= 1.0.2
+BUILD_VERSION ?= 1.0.3
 BUILD_DIR = build
 SPM_CONFIG ?= release
 APP_BUNDLE = $(BUILD_DIR)/$(APP_NAME).app
@@ -56,7 +56,7 @@ $(APP_EXECUTABLE): Info.plist $(ICON_ICNS) swift-build shader
 	@cp $(ICON_ICNS) "$(RESOURCES)/AppIcon.icns"
 	@plutil -replace NSMicrophoneUsageDescription -string "$(APP_NAME) needs microphone access to transcribe your speech." "$(CONTENTS)/Info.plist"
 	@plutil -replace NSSpeechRecognitionUsageDescription -string "$(APP_NAME) needs speech recognition to convert your voice to text." "$(CONTENTS)/Info.plist"
-	@plutil -replace NSAccessibilityUsageDescription -string "$(APP_NAME) needs accessibility access to detect the text cursor position and paste transcribed text." "$(CONTENTS)/Info.plist"
+	@plutil -replace NSInputMonitoringUsageDescription -string "$(APP_NAME) needs input monitoring to detect global dictation shortcuts while you use other apps." "$(CONTENTS)/Info.plist"
 	@echo "Built $(APP_BUNDLE)"
 
 bundle-model:
@@ -92,6 +92,10 @@ bundle-backend:
 	@ln -sf "python/standalone/bin/python3.13" "$(BUNDLED_BACKEND)/$(APP_NAME)"
 	@find "$(BUNDLED_BACKEND)/python/standalone" -type d \( -name '__pycache__' -o -name 'tests' -o -name 'test' \) -prune -exec rm -rf {} +
 	@find "$(BUNDLED_BACKEND)/python/standalone" -type f \( -name '*.pyc' -o -name '*.pyo' -o -name '*.a' \) -delete
+	@find "$(BUNDLED_BACKEND)/python/standalone/lib" -type d \( \
+		-name 'scipy' -o -name 'scipy-*.dist-info' -o \
+		-name 'sklearn' -o -name 'scikit_learn*.dist-info' \
+	\) -prune -exec rm -rf {} +
 	@rm -rf \
 		"$(BUNDLED_BACKEND)/python/standalone/bin/idle3.13" \
 		"$(BUNDLED_BACKEND)/python/standalone/bin/idle3" \

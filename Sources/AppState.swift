@@ -3,7 +3,7 @@ import Combine
 import AppKit
 import AVFoundation
 import ServiceManagement
-import ApplicationServices
+import CoreGraphics
 import ScreenCaptureKit
 import os.log
 private let recordingLog = OSLog(subsystem: "com.openspeech.app", category: "Recording")
@@ -289,9 +289,6 @@ final class AppState: ObservableObject, @unchecked Sendable {
     private let systemPromptPresetPromptsStorageKey = "system_prompt_preset_prompts"
     private let selectedSystemPromptPresetStorageKey = "selected_system_prompt_preset"
     private let systemPromptPresetMigrationV2StorageKey = "system_prompt_preset_migration_v2"
-    private let pasteAfterShortcutReleaseDelay: TimeInterval = 0.03
-    private let pressEnterAfterPasteDelay: TimeInterval = 0.08
-    private let clipboardRestoreDelay: TimeInterval = 1.0
     let maxPipelineHistoryCount = 20
     static let defaultContextScreenshotMaxDimension = Int(AppContextService.defaultScreenshotMaxDimension)
     static let contextScreenshotDimensionOptions = [1024, 768, 640, 512]
@@ -631,7 +628,6 @@ final class AppState: ObservableObject, @unchecked Sendable {
     @Published var lastTranscript: String = ""
     @Published var errorMessage: String?
     @Published var statusText: String = "Ready"
-    @Published var hasAccessibility = false
     @Published var hotkeyMonitoringErrorMessage: String?
     @Published var hasKeyboardMonitoringPermission = false
     @Published var isDebugOverlayActive = false
@@ -855,10 +851,10 @@ final class AppState: ObservableObject, @unchecked Sendable {
         }
         let hasCompletedOnboarding = UserDefaults.standard.bool(forKey: onboardingCompletedStorageKey)
         let launchAtLoginDesired = UserDefaults.standard.object(forKey: launchAtLoginDesiredStorageKey) == nil
-            ? true
+            ? false
             : UserDefaults.standard.bool(forKey: launchAtLoginDesiredStorageKey)
         let isPressEnterVoiceCommandEnabled = UserDefaults.standard.object(forKey: pressEnterVoiceCommandStorageKey) == nil
-            ? true
+            ? false
             : UserDefaults.standard.bool(forKey: pressEnterVoiceCommandStorageKey)
         let soundVolume: Float = UserDefaults.standard.object(forKey: soundVolumeStorageKey) != nil
             ? UserDefaults.standard.float(forKey: soundVolumeStorageKey) : 1.0
@@ -874,7 +870,6 @@ final class AppState: ObservableObject, @unchecked Sendable {
             initialMacros = []
         }
 
-        let initialAccessibility = AXIsProcessTrusted()
         let initialScreenCapturePermission = CGPreflightScreenCaptureAccess()
         var removedAudioFileNames: [String] = []
         do {
@@ -958,7 +953,6 @@ final class AppState: ObservableObject, @unchecked Sendable {
         self.soundVolume = soundVolume
         self.voiceMacros = initialMacros
         self.pipelineHistory = savedHistory
-        self.hasAccessibility = initialAccessibility
         self.hasScreenRecordingPermission = initialScreenCapturePermission
         self.hasKeyboardMonitoringPermission = CGPreflightListenEventAccess()
         self.launchAtLogin = launchAtLoginDesired
@@ -1611,48 +1605,21 @@ final class AppState: ObservableObject, @unchecked Sendable {
         }
     }
 
-    func startAccessibilityPolling() {
-        hasAccessibility = AXIsProcessTrusted()
+    func startPermissionPolling() {
         hasScreenRecordingPermission = hasScreenCapturePermission()
         hasKeyboardMonitoringPermission = CGPreflightListenEventAccess()
         accessibilityTimer?.invalidate()
         accessibilityTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] _ in
             DispatchQueue.main.async {
-                let wasTrusted = self?.hasAccessibility ?? false
-                let nowTrusted = AXIsProcessTrusted()
-                self?.hasAccessibility = nowTrusted
                 self?.hasScreenRecordingPermission = self?.hasScreenCapturePermission() ?? false
                 self?.hasKeyboardMonitoringPermission = CGPreflightListenEventAccess()
-                // Auto-restart when permission granted
-                if !wasTrusted && nowTrusted {
-                    self?.relaunchApp()
-                }
             }
         }
     }
 
-    private func relaunchApp() {
-        let appURL = Bundle.main.bundleURL
-        let config = NSWorkspace.OpenConfiguration()
-        config.createsNewApplicationInstance = true
-        NSWorkspace.shared.openApplication(at: appURL, configuration: config) { _, _ in
-            DispatchQueue.main.async {
-                NSApplication.shared.terminate(nil)
-            }
-        }
-    }
-
-    func stopAccessibilityPolling() {
+    func stopPermissionPolling() {
         accessibilityTimer?.invalidate()
         accessibilityTimer = nil
-    }
-
-    func openAccessibilitySettings() {
-        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue(): true] as CFDictionary
-        let trusted = AXIsProcessTrustedWithOptions(options)
-        if !trusted {
-            openPrivacySettingsPane("Privacy_Accessibility")
-        }
     }
 
     func openMicrophoneSettings() {
@@ -1757,7 +1724,7 @@ final class AppState: ObservableObject, @unchecked Sendable {
 
     func refreshLaunchAtLoginStatus() {
         let desired = UserDefaults.standard.object(forKey: launchAtLoginDesiredStorageKey) == nil
-            ? true
+            ? false
             : UserDefaults.standard.bool(forKey: launchAtLoginDesiredStorageKey)
         let current: Bool
         switch SMAppService.mainApp.status {
@@ -2249,8 +2216,7 @@ final class AppState: ObservableObject, @unchecked Sendable {
                 return .dictation
             }
             guard !trimmedSelectedText.isEmpty else {
-                rejectCommandModeSelectionRequirement(triggerMode: triggerMode)
-                return nil
+                return .dictation
             }
             return .command(invocation: .manual, selectedText: rawSelectedText)
         }
@@ -2317,17 +2283,8 @@ final class AppState: ObservableObject, @unchecked Sendable {
         startedAt: CFAbsoluteTime? = nil
     ) -> Bool {
         activeRecordingTriggerMode = triggerMode
-        guard hasAccessibility else {
-            errorMessage = "Accessibility permission required. Grant access in System Settings > Privacy & Security > Accessibility."
-            statusText = "No Accessibility"
-            activeRecordingTriggerMode = nil
-            currentSessionIntent = .dictation
-            shortcutSessionController.reset()
-            showAccessibilityAlert()
-            return false
-        }
         if let startedAt {
-            os_log(.info, log: recordingLog, "accessibility check passed: %.3fms", (CFAbsoluteTimeGetCurrent() - startedAt) * 1000)
+            os_log(.info, log: recordingLog, "recording preparation started: %.3fms", (CFAbsoluteTimeGetCurrent() - startedAt) * 1000)
         }
 
         let selectionSnapshot = selectionSnapshot ?? contextService.collectSelectionSnapshot()
@@ -2647,21 +2604,6 @@ final class AppState: ObservableObject, @unchecked Sendable {
         }
     }
 
-    func showAccessibilityAlert() {
-        let alert = NSAlert()
-        alert.messageText = "Accessibility Permission Required"
-        alert.informativeText = "\(AppName.displayName) cannot type transcriptions without Accessibility access.\n\nGo to System Settings > Privacy & Security > Accessibility and enable \(AppName.displayName)."
-        alert.alertStyle = .critical
-        alert.addButton(withTitle: "Open System Settings")
-        alert.addButton(withTitle: "Dismiss")
-        alert.icon = NSImage(systemSymbolName: "exclamationmark.triangle.fill", accessibilityDescription: nil)
-
-        let response = alert.runModal()
-        if response == .alertFirstButtonReturn {
-            openAccessibilitySettings()
-        }
-    }
-
     private func precomputeMacros() {
         precomputedMacros = voiceMacros.map { macro in
             PrecomputedMacro(
@@ -2681,30 +2623,9 @@ final class AppState: ObservableObject, @unchecked Sendable {
         from transcript: String,
         pressEnterCommandEnabled: Bool
     ) -> TranscriptCommandParsingResult {
-        guard pressEnterCommandEnabled else {
-            return TranscriptCommandParsingResult(
-                transcript: transcript.trimmingCharacters(in: .whitespacesAndNewlines),
-                shouldPressEnterAfterPaste: false
-            )
-        }
-
-        let fullRange = NSRange(transcript.startIndex..<transcript.endIndex, in: transcript)
-        guard
-            let match = trailingPressEnterCommandPattern.firstMatch(in: transcript, range: fullRange),
-            let commandRange = Range(match.range, in: transcript)
-        else {
-            return TranscriptCommandParsingResult(
-                transcript: transcript.trimmingCharacters(in: .whitespacesAndNewlines),
-                shouldPressEnterAfterPaste: false
-            )
-        }
-
-        var strippedTranscript = transcript
-        strippedTranscript.removeSubrange(commandRange)
-
         return TranscriptCommandParsingResult(
-            transcript: strippedTranscript.trimmingCharacters(in: .whitespacesAndNewlines),
-            shouldPressEnterAfterPaste: true
+            transcript: transcript.trimmingCharacters(in: .whitespacesAndNewlines),
+            shouldPressEnterAfterPaste: false
         )
     }
 
@@ -2713,9 +2634,7 @@ final class AppState: ObservableObject, @unchecked Sendable {
         parsedTranscript: TranscriptCommandParsingResult,
         isRetry: Bool = false
     ) -> String {
-        let status = outcome.statusMessage(isRetry: isRetry)
-        guard parsedTranscript.shouldPressEnterAfterPaste else { return status }
-        return "\(status); detected press enter command"
+        outcome.statusMessage(isRetry: isRetry)
     }
 
     func playAlertSound(named name: String) {
@@ -3198,9 +3117,7 @@ final class AppState: ObservableObject, @unchecked Sendable {
                         self.isTranscribing = false
                         self.endCriticalDictationActivity()
                         self.debugStatusMessage = "Done"
-                        let completionStatusText = self.preserveClipboard ? "Pasted at cursor!" : "Copied to clipboard!"
-                        let enterOnlyStatusText = "Pressed Enter"
-                        let shouldPressEnterAfterPaste = parsedTranscript.shouldPressEnterAfterPaste
+                        let completionStatusText = "Copied to clipboard"
 
                         let shouldPersistRawDictationFallback: Bool
                         switch processResult.outcome {
@@ -3211,13 +3128,10 @@ final class AppState: ObservableObject, @unchecked Sendable {
                         }
 
                         if trimmedFinalTranscript.isEmpty {
-                            self.statusText = shouldPressEnterAfterPaste ? enterOnlyStatusText : "Nothing to transcribe"
+                            self.statusText = "Nothing to transcribe"
                             self.clearPendingOverlayDismissToken()
                             if !self.showPostTranscriptionUpdateReminderIfNeeded() {
                                 self.overlayManager.dismiss()
-                            }
-                            if shouldPressEnterAfterPaste {
-                                self.pressEnterWhenShortcutReleased()
                             }
                         } else {
                             self.statusText = completionStatusText
@@ -3230,22 +3144,13 @@ final class AppState: ObservableObject, @unchecked Sendable {
                                 }
                             }
 
-                            let pendingClipboardRestore = self.writeTranscriptToPasteboard(trimmedFinalTranscript)
-                            self.pasteAtCursorWhenShortcutReleased {
-                                if shouldPressEnterAfterPaste {
-                                    self.pressEnterAfterPaste {
-                                        self.restoreClipboardIfNeeded(pendingClipboardRestore)
-                                    }
-                                } else {
-                                    self.restoreClipboardIfNeeded(pendingClipboardRestore)
-                                }
-                            }
+                            self.writeTranscriptToPasteboard(trimmedFinalTranscript)
                         }
 
                         self.audioRecorder.cleanup()
                         self.refreshAvailableMicrophonesIfNeeded()
 
-                        self.scheduleReadyStatusReset(after: 3, matching: [completionStatusText, "Nothing to transcribe", enterOnlyStatusText])
+                        self.scheduleReadyStatusReset(after: 3, matching: [completionStatusText, "Nothing to transcribe"])
                     }
                 } catch is CancellationError {
                     await MainActor.run {
@@ -3410,11 +3315,10 @@ final class AppState: ObservableObject, @unchecked Sendable {
 
     private func fallbackContextAtStop() -> AppContext {
         let frontmostApp = NSWorkspace.shared.frontmostApplication
-        let windowTitle = focusedWindowTitle(for: frontmostApp)
         return AppContext(
             appName: frontmostApp?.localizedName,
             bundleIdentifier: frontmostApp?.bundleIdentifier,
-            windowTitle: windowTitle,
+            windowTitle: frontmostApp?.localizedName,
             selectedText: nil,
             currentActivity: "Could not refresh app context at stop time; using text-only post-processing.",
             contextSystemPrompt: resolvedContextSystemPrompt(),
@@ -3428,42 +3332,6 @@ final class AppState: ObservableObject, @unchecked Sendable {
     private func resolvedContextSystemPrompt() -> String {
         let trimmedPrompt = customContextPrompt.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmedPrompt.isEmpty ? AppContextService.defaultContextPrompt : trimmedPrompt
-    }
-
-    private func focusedWindowTitle(for app: NSRunningApplication?) -> String? {
-        guard let app else { return nil }
-        let appElement = AXUIElementCreateApplication(app.processIdentifier)
-        return focusedWindowTitle(from: appElement)
-    }
-
-    private func focusedWindowTitle(from appElement: AXUIElement) -> String? {
-        guard let focusedWindow = accessibilityElement(from: appElement, attribute: kAXFocusedWindowAttribute as CFString) else {
-            return nil
-        }
-
-        guard let windowTitle = accessibilityString(from: focusedWindow, attribute: kAXTitleAttribute as CFString) else {
-            return nil
-        }
-
-        return trimmedText(windowTitle)
-    }
-
-    private func accessibilityElement(from element: AXUIElement, attribute: CFString) -> AXUIElement? {
-        var value: CFTypeRef?
-        let result = AXUIElementCopyAttributeValue(element, attribute, &value)
-        guard result == .success,
-              let rawValue = value,
-              CFGetTypeID(rawValue) == AXUIElementGetTypeID() else {
-            return nil
-        }
-        return unsafeBitCast(rawValue, to: AXUIElement.self)
-    }
-
-    private func accessibilityString(from element: AXUIElement, attribute: CFString) -> String? {
-        var value: CFTypeRef?
-        let result = AXUIElementCopyAttributeValue(element, attribute, &value)
-        guard result == .success, let stringValue = value as? String else { return nil }
-        return stringValue
     }
 
     private func trimmedText(_ value: String) -> String? {
@@ -3611,32 +3479,8 @@ final class AppState: ObservableObject, @unchecked Sendable {
         NotificationCenter.default.post(name: .showSettings, object: nil)
     }
 
-    private func pasteAtCursor() {
-        let source = CGEventSource(stateID: .hidSystemState)
-        let vKeyCode = CGKeyCode(9)
-
-        let keyDown = CGEvent(keyboardEventSource: source, virtualKey: vKeyCode, keyDown: true)
-        keyDown?.flags = .maskCommand
-        keyDown?.post(tap: .cgSessionEventTap)
-
-        let keyUp = CGEvent(keyboardEventSource: source, virtualKey: vKeyCode, keyDown: false)
-        keyUp?.flags = .maskCommand
-        keyUp?.post(tap: .cgSessionEventTap)
-    }
-
-    private func pressEnter() {
-        let source = CGEventSource(stateID: .hidSystemState)
-
-        let keyDown = CGEvent(keyboardEventSource: source, virtualKey: 36, keyDown: true)
-        keyDown?.post(tap: .cgSessionEventTap)
-
-        let keyUp = CGEvent(keyboardEventSource: source, virtualKey: 36, keyDown: false)
-        keyUp?.post(tap: .cgSessionEventTap)
-    }
-
-    private func writeTranscriptToPasteboard(_ transcript: String) -> PendingClipboardRestore? {
+    private func writeTranscriptToPasteboard(_ transcript: String) {
         let pasteboard = NSPasteboard.general
-        let snapshot = preserveClipboard ? PreservedPasteboardSnapshot(pasteboard: pasteboard) : nil
 
         // Append a space when ending with sentence-ending punctuation so the
         // next dictation does not jam against the prior period.
@@ -3649,56 +3493,6 @@ final class AppState: ObservableObject, @unchecked Sendable {
 
         pasteboard.clearContents()
         pasteboard.setString(textToWrite, forType: .string)
-
-        guard let snapshot else { return nil }
-        return PendingClipboardRestore(snapshot: snapshot, expectedChangeCount: pasteboard.changeCount)
-    }
-
-    private func restoreClipboardIfNeeded(_ pendingRestore: PendingClipboardRestore?) {
-        guard let pendingRestore else { return }
-
-        // Some apps consume Cmd-V asynchronously, so restoring too quickly can paste
-        // the pre-dictation clipboard instead of the transcript.
-        DispatchQueue.main.asyncAfter(deadline: .now() + clipboardRestoreDelay) {
-            let pasteboard = NSPasteboard.general
-            guard pasteboard.changeCount == pendingRestore.expectedChangeCount else { return }
-            pendingRestore.snapshot.restore(to: pasteboard)
-        }
-    }
-
-    private func performAfterShortcutReleased(attempt: Int = 0, action: @escaping () -> Void) {
-        let maxAttempts = 24
-        if hotkeyManager.hasPressedShortcutInputs && attempt < maxAttempts {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.025) { [weak self] in
-                self?.performAfterShortcutReleased(attempt: attempt + 1, action: action)
-            }
-            return
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + pasteAfterShortcutReleaseDelay) {
-            action()
-        }
-    }
-
-    private func pasteAtCursorWhenShortcutReleased(completion: (() -> Void)? = nil) {
-        performAfterShortcutReleased { [weak self] in
-            self?.pasteAtCursor()
-            completion?()
-        }
-    }
-
-    private func pressEnterWhenShortcutReleased(completion: (() -> Void)? = nil) {
-        performAfterShortcutReleased { [weak self] in
-            self?.pressEnter()
-            completion?()
-        }
-    }
-
-    private func pressEnterAfterPaste(completion: (() -> Void)? = nil) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + pressEnterAfterPasteDelay) { [weak self] in
-            self?.pressEnter()
-            completion?()
-        }
     }
 
     private func cancelRecordingInitializationTimer() {
