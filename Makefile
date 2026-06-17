@@ -1,6 +1,8 @@
 APP_NAME ?= Open Speech ASR
 EXECUTABLE_NAME ?= OpenSpeechASR
 BUNDLE_ID ?= com.openspeech.asr
+MARKETING_VERSION ?= 1.0
+BUILD_VERSION ?= 1.0.1
 BUILD_DIR = build
 SPM_CONFIG ?= release
 APP_BUNDLE = $(BUILD_DIR)/$(APP_NAME).app
@@ -47,6 +49,8 @@ $(APP_EXECUTABLE): Info.plist $(ICON_ICNS) swift-build shader
 	@plutil -replace CFBundleDisplayName -string "$(APP_NAME)" "$(CONTENTS)/Info.plist"
 	@plutil -replace CFBundleExecutable -string "$(EXECUTABLE_NAME)" "$(CONTENTS)/Info.plist"
 	@plutil -replace CFBundleIdentifier -string "$(BUNDLE_ID)" "$(CONTENTS)/Info.plist"
+	@plutil -replace CFBundleShortVersionString -string "$(MARKETING_VERSION)" "$(CONTENTS)/Info.plist"
+	@plutil -replace CFBundleVersion -string "$(BUILD_VERSION)" "$(CONTENTS)/Info.plist"
 	@plutil -replace LSMinimumSystemVersion -string "15.0" "$(CONTENTS)/Info.plist"
 	@cp $(ICON_ICNS) "$(RESOURCES)/AppIcon.icns"
 	@plutil -replace NSMicrophoneUsageDescription -string "$(APP_NAME) needs microphone access to transcribe your speech." "$(CONTENTS)/Info.plist"
@@ -87,6 +91,26 @@ bundle-backend:
 	@ln -sf "python/standalone/bin/python3.13" "$(BUNDLED_BACKEND)/$(APP_NAME)"
 	@find "$(BUNDLED_BACKEND)/python/standalone" -type d \( -name '__pycache__' -o -name 'tests' -o -name 'test' \) -prune -exec rm -rf {} +
 	@find "$(BUNDLED_BACKEND)/python/standalone" -type f \( -name '*.pyc' -o -name '*.pyo' -o -name '*.a' \) -delete
+	@rm -rf \
+		"$(BUNDLED_BACKEND)/python/standalone/bin/idle3.13" \
+		"$(BUNDLED_BACKEND)/python/standalone/bin/idle3" \
+		"$(BUNDLED_BACKEND)/python/standalone/bin/pydoc3.13" \
+		"$(BUNDLED_BACKEND)/python/standalone/bin/python3.13-config" \
+		"$(BUNDLED_BACKEND)/python/standalone/bin/pip" \
+		"$(BUNDLED_BACKEND)/python/standalone/bin/pip3" \
+		"$(BUNDLED_BACKEND)/python/standalone/bin/pip3.13" \
+		"$(BUNDLED_BACKEND)/python/standalone/lib/libtcl9.0.dylib" \
+		"$(BUNDLED_BACKEND)/python/standalone/lib/libtcl9tk9.0.dylib" \
+		"$(BUNDLED_BACKEND)/python/standalone/lib/tcl9" \
+		"$(BUNDLED_BACKEND)/python/standalone/lib/tcl9.0" \
+		"$(BUNDLED_BACKEND)/python/standalone/lib/tk9.0" \
+		"$(BUNDLED_BACKEND)/python/standalone/lib/thread3.0.4" \
+		"$(BUNDLED_BACKEND)/python/standalone/lib/itcl4.3.5" \
+		"$(BUNDLED_BACKEND)/python/standalone/lib/python3.13/idlelib" \
+		"$(BUNDLED_BACKEND)/python/standalone/lib/python3.13/tkinter" \
+		"$(BUNDLED_BACKEND)/python/standalone/lib/python3.13/turtledemo" \
+		"$(BUNDLED_BACKEND)/python/standalone/lib/python3.13/lib-dynload/_tkinter.cpython-313-darwin.so"
+	@find "$(BUNDLED_BACKEND)/python/standalone" -type l -exec sh -c 'for link do [ -e "$$link" ] || rm -f "$$link"; done' sh {} +
 	@echo "Bundled Gemma correction backend into $(BUNDLED_BACKEND)"
 
 codesign-app: bundle-model bundle-backend

@@ -1,5 +1,4 @@
 import AppKit
-import Carbon.HIToolbox
 
 enum ModifierKeyEventState {
     static func isKeyDown(for event: NSEvent) -> Bool? {
@@ -65,12 +64,15 @@ enum ModifierKeyEventState {
 }
 
 private extension NSEvent.ModifierFlags {
-    static let leftControl = Self(rawValue: UInt(NX_DEVICELCTLKEYMASK))
-    static let leftShift = Self(rawValue: UInt(NX_DEVICELSHIFTKEYMASK))
-    static let rightShift = Self(rawValue: UInt(NX_DEVICERSHIFTKEYMASK))
-    static let leftCommand = Self(rawValue: UInt(NX_DEVICELCMDKEYMASK))
-    static let rightCommand = Self(rawValue: UInt(NX_DEVICERCMDKEYMASK))
-    static let leftOption = Self(rawValue: UInt(NX_DEVICELALTKEYMASK))
-    static let rightOption = Self(rawValue: UInt(NX_DEVICERALTKEYMASK))
-    static let rightControl = Self(rawValue: UInt(NX_DEVICERCTLKEYMASK))
+    // Raw device-side modifier bits formerly exposed as Carbon HIToolbox
+    // NX_DEVICE* masks. Keeping the values here preserves left/right modifier
+    // shortcut behavior without linking the deprecated Carbon framework.
+    static let leftControl = Self(rawValue: 0x0000_0001)
+    static let leftShift = Self(rawValue: 0x0000_0002)
+    static let rightShift = Self(rawValue: 0x0000_0004)
+    static let leftCommand = Self(rawValue: 0x0000_0008)
+    static let rightCommand = Self(rawValue: 0x0000_0010)
+    static let leftOption = Self(rawValue: 0x0000_0020)
+    static let rightOption = Self(rawValue: 0x0000_0040)
+    static let rightControl = Self(rawValue: 0x0000_2000)
 }
