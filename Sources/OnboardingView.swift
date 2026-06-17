@@ -67,7 +67,7 @@ struct OnboardingView: View {
     private var canAdvance: Bool {
         switch currentStep {
         case .permissions:
-            return micPermissionGranted && appState.hasAccessibility
+            return micPermissionGranted && appState.hasAccessibility && appState.hasKeyboardMonitoringPermission
         case .test:
             return testPhase == .done && testError == nil && !testTranscript.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         default:
@@ -257,6 +257,18 @@ struct OnboardingView: View {
                 actionTitle: "打开系统设置",
                 action: {
                     appState.openAccessibilitySettings()
+                }
+            )
+
+            permissionCard(
+                title: "键盘监听",
+                detail: "必须开启。用于在其他 App 中响应全局快捷键。",
+                icon: "keyboard.fill",
+                granted: appState.hasKeyboardMonitoringPermission,
+                required: true,
+                actionTitle: "授权键盘监听",
+                action: {
+                    appState.requestKeyboardMonitoringAccess()
                 }
             )
 
@@ -547,6 +559,7 @@ struct OnboardingView: View {
         micPermissionGranted = AVCaptureDevice.authorizationStatus(for: .audio) == .authorized
         appState.hasAccessibility = AXIsProcessTrusted()
         appState.hasScreenRecordingPermission = CGPreflightScreenCaptureAccess()
+        appState.hasKeyboardMonitoringPermission = CGPreflightListenEventAccess()
     }
 
     private func startPermissionPolling() {

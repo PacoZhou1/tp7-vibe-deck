@@ -1063,6 +1063,15 @@ struct GeneralSettingsView: View {
             )
 
             permissionRow(
+                title: "Input Monitoring",
+                icon: "keyboard.fill",
+                granted: appState.hasKeyboardMonitoringPermission,
+                action: {
+                    appState.requestKeyboardMonitoringAccess()
+                }
+            )
+
+            permissionRow(
                 title: "Screen Recording",
                 icon: "camera.viewfinder",
                 granted: appState.hasScreenRecordingPermission,

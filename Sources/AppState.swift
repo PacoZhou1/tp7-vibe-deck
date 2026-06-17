@@ -633,6 +633,7 @@ final class AppState: ObservableObject, @unchecked Sendable {
     @Published var statusText: String = "Ready"
     @Published var hasAccessibility = false
     @Published var hotkeyMonitoringErrorMessage: String?
+    @Published var hasKeyboardMonitoringPermission = false
     @Published var isDebugOverlayActive = false
     @Published var selectedSettingsTab: SettingsTab? = .general
     @Published var pipelineHistory: [PipelineHistoryItem] = []
@@ -959,6 +960,7 @@ final class AppState: ObservableObject, @unchecked Sendable {
         self.pipelineHistory = savedHistory
         self.hasAccessibility = initialAccessibility
         self.hasScreenRecordingPermission = initialScreenCapturePermission
+        self.hasKeyboardMonitoringPermission = CGPreflightListenEventAccess()
         self.launchAtLogin = launchAtLoginDesired
         self.selectedMicrophoneID = selectedMicrophoneID
         self.precomputeMacros()
@@ -1612,6 +1614,7 @@ final class AppState: ObservableObject, @unchecked Sendable {
     func startAccessibilityPolling() {
         hasAccessibility = AXIsProcessTrusted()
         hasScreenRecordingPermission = hasScreenCapturePermission()
+        hasKeyboardMonitoringPermission = CGPreflightListenEventAccess()
         accessibilityTimer?.invalidate()
         accessibilityTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] _ in
             DispatchQueue.main.async {
@@ -1619,6 +1622,7 @@ final class AppState: ObservableObject, @unchecked Sendable {
                 let nowTrusted = AXIsProcessTrusted()
                 self?.hasAccessibility = nowTrusted
                 self?.hasScreenRecordingPermission = self?.hasScreenCapturePermission() ?? false
+                self?.hasKeyboardMonitoringPermission = CGPreflightListenEventAccess()
                 // Auto-restart when permission granted
                 if !wasTrusted && nowTrusted {
                     self?.relaunchApp()
@@ -1653,6 +1657,21 @@ final class AppState: ObservableObject, @unchecked Sendable {
 
     func openMicrophoneSettings() {
         openPrivacySettingsPane("Privacy_Microphone")
+    }
+
+    func requestKeyboardMonitoringAccess() {
+        hasKeyboardMonitoringPermission = CGPreflightListenEventAccess()
+        guard !hasKeyboardMonitoringPermission else { return }
+
+        hasKeyboardMonitoringPermission = CGRequestListenEventAccess()
+        if !hasKeyboardMonitoringPermission {
+            openKeyboardMonitoringSettings()
+        }
+        restartHotkeyMonitoring()
+    }
+
+    func openKeyboardMonitoringSettings() {
+        openPrivacySettingsPane("Privacy_ListenEvent")
     }
 
     func requestMicrophoneAccess(completion: @escaping (Bool) -> Void) {
@@ -2031,9 +2050,10 @@ final class AppState: ObservableObject, @unchecked Sendable {
         do {
             try hotkeyManager.start(configuration: activeShortcutConfiguration)
             hotkeyMonitoringErrorMessage = nil
+            hasKeyboardMonitoringPermission = true
         } catch {
-            // MLX Voice Input: suppress shortcut error, use manual button
-            hotkeyMonitoringErrorMessage = nil
+            hasKeyboardMonitoringPermission = CGPreflightListenEventAccess()
+            hotkeyMonitoringErrorMessage = error.localizedDescription
         }
     }
 
