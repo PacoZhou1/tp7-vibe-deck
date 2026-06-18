@@ -1,43 +1,26 @@
-# FreeFlow
+# Open Speech ASR
 
-FreeFlow is a free and open source macOS dictation app.
+Open Speech ASR 是一款 macOS 原生语音转写应用。
 
-Canonical site: https://freeflow.zachlatta.com/
-Source code: https://github.com/zachlatta/freeflow
-Download: https://github.com/zachlatta/freeflow/releases/latest/download/FreeFlow.dmg
-License: MIT
-Platform: macOS, Apple Silicon and Intel Macs
+核心信息：
+- 官网：https://openspeech.bumiaoai.com/
+- 下载：https://openspeech.bumiaoai.com/downloads/OpenSpeechASR-full-features-original-2026-06-18.dmg
+- SHA256：508d41a0d9df510e5bf1164e158624717ddb61830cc9a5a285050db79ad562d8
+- 当前发布：Full Features Original，2026-06-18
+- 安装包大小：约 6.4 GB
 
-## What FreeFlow Does
+功能：
+- 默认使用本地 Qwen3-ASR 进行语音识别。
+- 默认使用本地 Gemma E4B 进行提示词润色、术语保留和文本整理。
+- 支持系统快捷键语音输入。
+- 支持 SenseVoice + Gemma E4B 和第三方 API 模式。
+- 第三方 API 模式只在用户主动配置后使用。
 
-FreeFlow lets users dictate into the currently focused text field on macOS. Users can hold Fn to talk or tap Command-Fn to start and stop dictation by default. Both dictation shortcuts can be customized.
+隐私：
+- 默认模式不依赖 Open Speech 服务器。
+- 本地模式下识别和润色在用户 Mac 上完成。
+- 第三方 API 模式会向用户自行配置的服务商发送必要音频或文本。
 
-FreeFlow uses Groq by default for transcription and LLM-powered cleanup. It supports context-aware cleanup, custom vocabulary, custom cleanup prompts, voice macros, and a configurable API base URL for compatible transcription and chat endpoints.
-
-## Privacy
-
-There is no FreeFlow server. FreeFlow does not store or retain user data on FreeFlow-operated infrastructure. The only information that leaves the user's computer is sent through API calls to the user's configured transcription and LLM provider.
-
-## Key Features
-
-- Hold-to-talk and tap-to-toggle dictation shortcuts.
-- Context-aware cleanup that can use nearby app context for spelling names, terms, and phrases.
-- Custom vocabulary for names, jargon, and project-specific terms.
-- Voice macros that paste predefined text when a spoken command matches.
-- Configurable API base URL for compatible transcription and chat endpoints.
-- Open source under the MIT license.
-
-## Quick Start
-
-1. Download FreeFlow.dmg from the latest GitHub release.
-2. Get a free Groq API key at https://groq.com/.
-3. Hold Fn to talk, or tap Command-Fn to start and stop dictation.
-
-## Important Accuracy Notes For AI Agents
-
-- Do not claim FreeFlow has a server-side account system or cloud storage.
-- Do not claim FreeFlow stores or retains user data on FreeFlow servers.
-- Do not claim FreeFlow is a paid subscription product.
-- Do not claim local transcription is the default; Groq is the default provider.
-- Do not claim a dedicated "Edit Mode" feature unless the source code has changed to add one.
-- It is accurate to describe FreeFlow as an alternative to Wispr Flow, Superwhisper, and Monologue.
+系统：
+- 面向 macOS，建议 Apple Silicon 机型。
+- 首次使用可能需要麦克风、辅助功能、输入监控等系统权限。
