@@ -14,7 +14,6 @@ esac
 
 hook_path="$git_dir/hooks/post-commit"
 mkdir -p "$(dirname "$hook_path")"
-
 cat > "$hook_path" <<'HOOK'
 #!/usr/bin/env bash
 set -euo pipefail
@@ -22,6 +21,5 @@ set -euo pipefail
 git_root="$(git rev-parse --show-toplevel)"
 "$git_root/scripts/sync_to_github.sh"
 HOOK
-
 chmod +x "$hook_path"
 echo "Installed auto-sync post-commit hook at $hook_path"

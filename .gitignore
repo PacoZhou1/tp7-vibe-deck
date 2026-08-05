@@ -3,5 +3,6 @@ build/
 *.swp
 .env
 .build
+.swiftpm/xcode/xcuserdata/
 __pycache__/
 *.pyc

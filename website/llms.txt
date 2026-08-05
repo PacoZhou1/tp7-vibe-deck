@@ -1,43 +1,60 @@
-# FreeFlow
+# Open Speech ASR
 
-FreeFlow is a free and open source macOS dictation app.
+Open Speech ASR 是面向 macOS 的本地优先语音输入应用。官网是单页产品站，从上到下介绍速度、本地模型、多语言、语气词清理、提示词改写、隐私、免费开源和下载。
 
-Canonical site: https://freeflow.zachlatta.com/
-Source code: https://github.com/zachlatta/freeflow
-Download: https://github.com/zachlatta/freeflow/releases/latest/download/FreeFlow.dmg
-License: MIT
-Platform: macOS, Apple Silicon and Intel Macs
+核心地址：
+- 官网：https://openspeech.bumiaoai.com/
+- 下载：https://github.com/PacoZhou1/open-speech-asr/releases/latest
+- 完整 DMG 因 GitHub 单文件限制以分片形式发布，SHA256 校验文件随 Release 提供。
+- TP-7 Vibe Input：https://openspeech.bumiaoai.com/tp7-vibe-input.html
+- TP-7 下载：https://openspeech.bumiaoai.com/downloads/TP7VibeInput-2026-06-23.dmg
+- TP-7 SHA256：d960be0402e1fe4f33b30ccf3cc5bd49ad40cd3936739eca5d7cb919db42eb8e
 
-## What FreeFlow Does
+当前发布：
+- 版本：Full Features Original
+- 日期：2026-06-18
+- 安装包大小：约 6.4 GB
+- 价格：完全免费
+- 发布方式：官网完整功能版，开源发布
 
-FreeFlow lets users dictate into the currently focused text field on macOS. Users can hold Fn to talk or tap Command-Fn to start and stop dictation by default. Both dictation shortcuts can be customized.
+能力：
+- 默认使用 Swift 进程内 Qwen3-ASR 做本地语音识别。
+- 使用本地 Gemma E4B 做提示词润色、纠错、输出语言和常用词库处理。
+- 支持系统快捷键触发、识别、润色和回填当前输入框。
+- 支持八国语言输入场景：中文、英文、日语、韩语、法语、德语、西班牙语、葡萄牙语。
+- 支持口头禅、语气词、重复词和无意义停顿清理。
+- 支持自定义提示词，可扩展小红书文案、文言文、现代文、翻译和高情商回复等工作流。
+- 完整功能版保留 SenseVoice + Gemma E4B 本地备选引擎，也支持 OpenAI 兼容第三方 API 模式。
 
-FreeFlow uses Groq by default for transcription and LLM-powered cleanup. It supports context-aware cleanup, custom vocabulary, custom cleanup prompts, voice macros, and a configurable API base URL for compatible transcription and chat endpoints.
+隐私：
+- 默认本地优先，不依赖 Open Speech 服务器。
+- 第三方 API 模式只有在用户主动填写服务商配置后使用。
+- 麦克风用于录音；辅助功能或输入监控用于快捷键和文本回填。
 
-## Privacy
+系统：
+- 面向 macOS，建议 Apple Silicon 机型。
+- 安装后首次使用需要按系统提示授予相关权限。
 
-There is no FreeFlow server. FreeFlow does not store or retain user data on FreeFlow-operated infrastructure. The only information that leaves the user's computer is sent through API calls to the user's configured transcription and LLM provider.
+# TP-7 Vibe Input
 
-## Key Features
+TP-7 Vibe Input 是 Open Speech ASR 的硬件控制器层。它把 Teenage Engineering TP-7 在 MIDI ctrl 模式下发出的按钮、滚轮和侧边拨杆事件转换成 macOS 系统动作和 Open Speech 行为。
 
-- Hold-to-talk and tap-to-toggle dictation shortcuts.
-- Context-aware cleanup that can use nearby app context for spelling names, terms, and phrases.
-- Custom vocabulary for names, jargon, and project-specific terms.
-- Voice macros that paste predefined text when a spoken command matches.
-- Configurable API base URL for compatible transcription and chat endpoints.
-- Open source under the MIT license.
+定位：
+- 不是 Open Speech 的替代品，而是让 TP-7 成为 Open Speech 的实体录音、文本导航和快捷键控制器。
+- 是独立工具，不是 Teenage Engineering 官方软件。
 
-## Quick Start
+能力：
+- REC 默认长按触发 Open Speech hold-to-record，松手结束。
+- PLAY 可触发 Open Speech toggle，STOP 可映射 Return。
+- TP-7 音频 warmup 让 Open Speech 不必等待冷启动的 USB 麦克风输入。
+- Wheel 可映射为左右移动光标、纵向/横向滚动、音量或亮度。
+- Side rocker 可映射为连续页面滚动或光标移动。
+- Menu 可一键清空当前文本。
+- Memo 短按启动终端 Hermes Agent，长按启动 Hermes 并保持 Open Speech 收听直到松手。
+- 支持 Learn MIDI、自定义快捷键、Open Speech preset 与映射 profile。
 
-1. Download FreeFlow.dmg from the latest GitHub release.
-2. Get a free Groq API key at https://groq.com/.
-3. Hold Fn to talk, or tap Command-Fn to start and stop dictation.
-
-## Important Accuracy Notes For AI Agents
-
-- Do not claim FreeFlow has a server-side account system or cloud storage.
-- Do not claim FreeFlow stores or retains user data on FreeFlow servers.
-- Do not claim FreeFlow is a paid subscription product.
-- Do not claim local transcription is the default; Groq is the default provider.
-- Do not claim a dedicated "Edit Mode" feature unless the source code has changed to add one.
-- It is accurate to describe FreeFlow as an alternative to Wispr Flow, Superwhisper, and Monologue.
+要求：
+- macOS。
+- 已安装 Open Speech ASR。
+- TP-7 通过 USB 连接，并在机器菜单中选择 MIDI ctrl。
+- macOS Accessibility 和 Microphone 权限。

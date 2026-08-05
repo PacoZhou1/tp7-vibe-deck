@@ -65,6 +65,8 @@ class MemoryCleanupRequest(BaseModel):
 
 class HealthResponse(BaseModel):
     status: str
+    processId: int
+    sessionToken: str
     modelLoaded: bool
     localLLMEnabled: bool = True
     asrLoaded: bool
@@ -93,7 +95,7 @@ MEMORY_CLEANUP_THRESHOLD_MB = float(
         os.getenv("INFERENCE_MEMORY_CLEANUP_THRESHOLD_MB", "8000"),
     )
 )
-MEMORY_RESTART_THRESHOLD_MB = float(os.getenv("INFERENCE_MEMORY_RESTART_THRESHOLD_MB", "9500"))
+MEMORY_RESTART_THRESHOLD_MB = float(os.getenv("INFERENCE_MEMORY_RESTART_THRESHOLD_MB", "9000"))
 MEMORY_MONITOR_INTERVAL_SECONDS = float(os.getenv("INFERENCE_MEMORY_MONITOR_INTERVAL_SECONDS", "10"))
 MLX_INITIAL_CACHE_LIMIT_MB = float(os.getenv("INFERENCE_MLX_INITIAL_CACHE_LIMIT_MB", "2048"))
 MLX_CACHE_FLOOR_MB = float(os.getenv("INFERENCE_MLX_CACHE_FLOOR_MB", "256"))
@@ -111,6 +113,7 @@ MLX_OUTPUT_TOKEN_RATIO = float(os.getenv("INFERENCE_MLX_OUTPUT_TOKEN_RATIO", "1.
 MLX_KV_BITS = int(os.getenv("INFERENCE_MLX_KV_BITS", "0"))
 LOCAL_LLM_ENABLED = os.getenv("INFERENCE_DISABLE_LOCAL_LLM", "0") != "1"
 LOCAL_ASR_ENABLED = os.getenv("INFERENCE_DISABLE_SENSEVOICE_ASR", "0") != "1"
+BACKEND_SESSION_TOKEN = os.getenv("INFERENCE_SESSION_TOKEN", "")
 
 
 class MemoryGuard:
@@ -864,6 +867,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.middleware("http")
+async def attach_backend_identity(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Open-Speech-Session"] = BACKEND_SESSION_TOKEN
+    response.headers["X-Open-Speech-PID"] = str(os.getpid())
+    return response
+
+
 # Determine base dir for model paths
 _BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -902,6 +914,8 @@ async def health_check():
     llm_ready = (not LOCAL_LLM_ENABLED) or correction_service.is_loaded
     return HealthResponse(
         status="healthy" if asr_ready and llm_ready else "degraded",
+        processId=os.getpid(),
+        sessionToken=BACKEND_SESSION_TOKEN,
         modelLoaded=correction_service.is_loaded,
         localLLMEnabled=LOCAL_LLM_ENABLED,
         asrLoaded=asr_service.is_loaded,
@@ -1138,6 +1152,8 @@ async def openai_chat_completions(request: dict):
 async def get_metrics():
     memory = MemoryGuard.snapshot()
     return {
+        "processId": os.getpid(),
+        "sessionToken": BACKEND_SESSION_TOKEN,
         "modelLoaded": correction_service.is_loaded,
         "localLLMEnabled": LOCAL_LLM_ENABLED,
         "asrLoaded": asr_service.is_loaded,
@@ -1157,9 +1173,11 @@ async def cleanup_memory(request: Optional[MemoryCleanupRequest] = Body(default=
         peer_tracked_memory_mb=request.peerMlxTrackedMemoryMb if request else 0.0,
         peer_memory_footprint_mb=request.peerMemoryFootprintMb if request else None,
     )
+    last_cleanup = MemoryGuard.last_cleanup or {}
     return {
         "triggered": triggered,
         **MemoryGuard.snapshot(),
+        "needsBackendRestart": bool(last_cleanup.get("restartRecommended", False)),
         "timestamp": datetime.now().isoformat(),
     }
 

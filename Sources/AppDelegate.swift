@@ -5,11 +5,12 @@ import os.log
 
 class AppDelegate: NSObject, NSApplicationDelegate {
     private let combinedLocalMemorySoftLimitMb = 8_000.0
-    private let combinedLocalMemoryHardLimitMb = 9_500.0
+    private let combinedLocalMemoryHardLimitMb = 9_000.0
     private let backendMemoryCleanupLimitMb = 8_000.0
-    private let backendMemoryRestartLimitMb = 9_500.0
+    private let backendMemoryRestartLimitMb = 9_000.0
     private let backendMemoryMonitorInterval: TimeInterval = 10
     private let backendRestartIdleDelay: TimeInterval = 2
+    private let backendSessionToken = UUID().uuidString
 
     let appState = AppState()
     var setupWindow: NSWindow?
@@ -30,11 +31,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var serverUsesSenseVoiceASR = false
     private var pendingBackendRestartReason: String?
     private var scheduledBackendRestart: DispatchWorkItem?
+    private var scheduledIdleMemoryCheck: DispatchWorkItem?
     private var lastBackendMemoryCleanupRequestAt: Date?
     private var lastLocalASRMemoryCleanupRequestAt: Date?
+    private var lastLocalASRModelReleaseRequestAt: Date?
     private var cancellables = Set<AnyCancellable>()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        appState.configureLocalBackendSession(token: backendSessionToken)
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleShowSetup),
@@ -348,11 +352,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             os_log(.error, log: OSLog.default, "[OPEN SPEECH] Server script not found: %{public}@", serverScript.path)
             return false
         }
+        stopOrphanedBackendProcesses()
 
-        // Use /tmp for log to avoid sandbox issues
+        // Keep one append-only log so parallel/stale app copies cannot replace
+        // the inode while a running backend still owns its file handle.
         let logPath = "\(NSHomeDirectory())/openspeech-server.log"
-        FileManager.default.createFile(atPath: logPath, contents: nil)
+        if !FileManager.default.fileExists(atPath: logPath) {
+            FileManager.default.createFile(atPath: logPath, contents: nil)
+        }
         let logFH = FileHandle(forWritingAtPath: logPath)
+        _ = try? logFH?.seekToEnd()
 
         let process = Process()
         process.executableURL = pythonBin
@@ -364,11 +373,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             "INFERENCE_MEMORY_SOFT_LIMIT_MB": "\(Int(combinedLocalMemorySoftLimitMb))",
             "INFERENCE_MEMORY_CLEANUP_THRESHOLD_MB": "\(Int(backendMemoryCleanupLimitMb))",
             "INFERENCE_MEMORY_RESTART_THRESHOLD_MB": "\(Int(backendMemoryRestartLimitMb))",
+            "INFERENCE_MLX_MEMORY_LIMIT_MB": "\(Int(combinedLocalMemoryHardLimitMb))",
             "INFERENCE_MLX_INITIAL_CACHE_LIMIT_MB": "2048",
             "INFERENCE_MLX_CACHE_FLOOR_MB": "256",
             "INFERENCE_MLX_CACHE_HEADROOM_MB": "512",
             "INFERENCE_DISABLE_LOCAL_LLM": "0",
             "INFERENCE_DISABLE_SENSEVOICE_ASR": appState.shouldRunSenseVoiceASRBackend ? "0" : "1",
+            "INFERENCE_SESSION_TOKEN": backendSessionToken,
             "PYTHONNOUSERSITE": "1",
             "PYTHONDONTWRITEBYTECODE": "1",
             "PATH": "/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin:/usr/local/bin",
@@ -405,6 +416,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    private func stopOrphanedBackendProcesses() {
+        guard serverProcess == nil || serverProcess?.isRunning == false else { return }
+        let patterns = [
+            "Open Speech ASR.app/Contents/Resources/backend/.*inference_server.py",
+            "Contents/Resources/backend/.*inference_server.py",
+            "openspeech-dev/backend/.*inference_server.py",
+        ]
+
+        for pattern in patterns {
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/usr/bin/pkill")
+            process.arguments = ["-f", pattern]
+            process.standardOutput = nil
+            process.standardError = nil
+            do {
+                try process.run()
+                process.waitUntilExit()
+            } catch {
+                os_log(.debug, log: OSLog.default, "[OPEN SPEECH] pkill unavailable for stale backend cleanup: %{public}@", error.localizedDescription)
+            }
+        }
+        Thread.sleep(forTimeInterval: 0.3)
+    }
+
     private func stopLocalInferenceServer() {
         guard let process = serverProcess else { return }
         isStoppingLocalInferenceServer = true
@@ -432,6 +467,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         backendMemoryTimer = nil
         scheduledBackendRestart?.cancel()
         scheduledBackendRestart = nil
+        scheduledIdleMemoryCheck?.cancel()
+        scheduledIdleMemoryCheck = nil
         pendingBackendRestartReason = nil
         isBackendMemoryCleanupInFlight = false
         isLocalASRMemoryCleanupInFlight = false
@@ -447,11 +484,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 if isRecording || isTranscribing {
                     self.scheduledBackendRestart?.cancel()
                     self.scheduledBackendRestart = nil
+                    self.scheduledIdleMemoryCheck?.cancel()
+                    self.scheduledIdleMemoryCheck = nil
                     return
                 }
                 self.schedulePendingBackendRestartIfIdle()
+                self.scheduleCombinedMemoryCheckAfterIdle()
             }
             .store(in: &cancellables)
+    }
+
+    private func scheduleCombinedMemoryCheckAfterIdle() {
+        guard scheduledIdleMemoryCheck == nil,
+              appState.shouldRunLocalGemmaBackend,
+              !isBackendRestartInProgress,
+              !isTerminating else { return }
+
+        let workItem = DispatchWorkItem { [weak self] in
+            guard let self,
+                  !self.appState.isRecording,
+                  !self.appState.isTranscribing else { return }
+            self.scheduledIdleMemoryCheck = nil
+            self.checkBackendMemory()
+        }
+        scheduledIdleMemoryCheck = workItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + backendRestartIdleDelay, execute: workItem)
     }
 
     private struct BackendMemoryMetrics {
@@ -493,6 +550,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return false
     }
 
+    private func configureBackendIdentityHeader(_ request: inout URLRequest) {
+        request.setValue(backendSessionToken, forHTTPHeaderField: "X-Open-Speech-Session")
+    }
+
+    private func isExpectedBackendResponse(_ response: URLResponse?) -> Bool {
+        guard let httpResponse = response as? HTTPURLResponse,
+              let process = serverProcess,
+              process.isRunning else {
+            return false
+        }
+        let responseToken = httpResponse.value(forHTTPHeaderField: "X-Open-Speech-Session")
+        let responsePID = httpResponse.value(forHTTPHeaderField: "X-Open-Speech-PID")
+        let matches = responseToken == backendSessionToken
+            && responsePID == String(process.processIdentifier)
+        if !matches {
+            os_log(
+                .error,
+                log: OSLog.default,
+                "[OPEN SPEECH] Rejected stale backend response: expected PID=%d",
+                process.processIdentifier
+            )
+        }
+        return matches
+    }
+
     private static func currentProcessMemoryUsageMb() -> Double {
         var info = task_vm_info_data_t()
         var count = mach_msg_type_number_t(MemoryLayout<task_vm_info_data_t>.stride / MemoryLayout<integer_t>.stride)
@@ -515,9 +597,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let url = URL(string: "http://127.0.0.1:8001/api/metrics")!
         var request = URLRequest(url: url, timeoutInterval: 3)
         request.httpMethod = "GET"
+        configureBackendIdentityHeader(&request)
 
-        URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
-            guard let self, error == nil, let data else { return }
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            guard let self,
+                  error == nil,
+                  self.isExpectedBackendResponse(response),
+                  let data else { return }
             guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
             let backend = Self.backendMemoryMetrics(from: json)
 
@@ -544,7 +630,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     ) {
         let combinedTracked = backend.mlxTrackedMemoryMb + qwen.mlxTrackedMemoryMb
         let combinedProcess = backend.memoryUsageMb + appMemoryUsageMb
-        let backendBudgetFootprint = max(backend.mlxTrackedMemoryMb, backend.memoryUsageMb)
         let qwenBudgetFootprint = max(qwen.mlxTrackedMemoryMb, appMemoryUsageMb)
         let overSoftLimit = combinedTracked >= combinedLocalMemorySoftLimitMb
             || combinedProcess >= combinedLocalMemorySoftLimitMb
@@ -569,7 +654,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         )
 
         requestLocalASRMemoryCleanupIfNeeded(
-            backendMemoryFootprintMb: backendBudgetFootprint,
+            backend: backend,
             combinedTrackedMb: combinedTracked,
             combinedProcessMb: combinedProcess
         )
@@ -581,7 +666,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             combinedProcessMb: combinedProcess
         )
 
-        if overHardLimit {
+        if overSoftLimit || overHardLimit {
             requestLocalASRModelReleaseIfIdle(
                 qwen: qwen,
                 backendTrackedMb: backend.mlxTrackedMemoryMb,
@@ -597,12 +682,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         combinedTracked
                     )
                 )
+            } else if overHardLimit,
+                      !isLocalASRMemoryReleaseInFlight,
+                      (qwen.mlxTrackedMemoryMb <= 512
+                        || hasRecentLocalASRModelReleaseRequest) {
+                requestBackendRestart(
+                    reason: String(
+                        format: "combined memory remained above 9GB after cache cleanup/model release: tracked=%.0f MB process=%.0f MB",
+                        combinedTracked,
+                        combinedProcess
+                    )
+                )
             }
         }
     }
 
     private func requestLocalASRMemoryCleanupIfNeeded(
-        backendMemoryFootprintMb: Double,
+        backend: BackendMemoryMetrics,
         combinedTrackedMb: Double,
         combinedProcessMb: Double
     ) {
@@ -618,7 +714,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             guard let self else { return }
             let result = await self.appState.performLocalASRMemoryMaintenance(
                 globalSoftLimitMb: self.combinedLocalMemorySoftLimitMb,
-                peerTrackedMemoryMb: backendMemoryFootprintMb,
+                peerTrackedMemoryMb: max(backend.mlxTrackedMemoryMb, backend.memoryUsageMb),
                 reason: "combined-memory-supervisor",
                 force: true
             )
@@ -635,6 +731,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     combinedTrackedMb,
                     combinedProcessMb
                 )
+                let estimatedTrackedAfter = backend.mlxTrackedMemoryMb + result.after.mlxTrackedMemoryMb
+                let estimatedProcessAfter = backend.memoryUsageMb + Self.currentProcessMemoryUsageMb()
+                if estimatedTrackedAfter >= self.combinedLocalMemorySoftLimitMb
+                    || estimatedProcessAfter >= self.combinedLocalMemorySoftLimitMb {
+                    self.requestLocalASRModelReleaseIfIdle(
+                        qwen: result.after,
+                        backendTrackedMb: backend.mlxTrackedMemoryMb,
+                        backendCacheMb: backend.mlxCacheMemoryMb,
+                        combinedTrackedMb: estimatedTrackedAfter,
+                        combinedProcessMb: estimatedProcessAfter
+                    )
+                }
             }
         }
     }
@@ -669,18 +777,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         var request = URLRequest(url: URL(string: "http://127.0.0.1:8001/api/memory/cleanup")!, timeoutInterval: 10)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        configureBackendIdentityHeader(&request)
         request.httpBody = try? JSONSerialization.data(withJSONObject: [
             "reason": "combined-memory-supervisor",
             "globalSoftLimitMb": combinedLocalMemorySoftLimitMb,
             "peerMlxTrackedMemoryMb": peerTrackedMemoryMb,
             "peerMemoryFootprintMb": peerMemoryFootprintMb,
         ])
-        URLSession.shared.dataTask(with: request) { [weak self] data, _, error in
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             guard let self else { return }
             DispatchQueue.main.async {
                 self.isBackendMemoryCleanupInFlight = false
             }
-            guard error == nil, let data else { return }
+            guard error == nil,
+                  self.isExpectedBackendResponse(response),
+                  let data else { return }
             guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
             let after = Self.doubleValue(json, "memoryUsageMb")
             let afterTracked = Self.doubleValue(json, "mlxTrackedMemoryMb")
@@ -702,6 +813,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         )
                     )
                 }
+            } else {
+                DispatchQueue.main.asyncAfter(deadline: .now() + self.backendRestartIdleDelay) {
+                    self.checkBackendMemory()
+                }
             }
         }.resume()
     }
@@ -713,6 +828,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         combinedTrackedMb: Double,
         combinedProcessMb: Double
     ) {
+        if let lastLocalASRModelReleaseRequestAt,
+           Date().timeIntervalSince(lastLocalASRModelReleaseRequestAt) < 30 {
+            return
+        }
         guard appState.asrEngineMode == .qwenNative,
               !appState.isRecording,
               !appState.isTranscribing,
@@ -722,11 +841,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
               qwen.mlxTrackedMemoryMb > 512 else { return }
 
         isLocalASRMemoryReleaseInFlight = true
+        lastLocalASRModelReleaseRequestAt = Date()
         Task { [weak self] in
             guard let self else { return }
             let result = await self.appState.releaseLocalASRModelForMemoryPressure(
                 reason: String(
-                    format: "combined tracked/process %.0f/%.0f MB over hard limit with backend %.0f MB",
+                    format: "combined tracked/process %.0f/%.0f MB over 8GB budget with backend %.0f MB",
                     combinedTrackedMb,
                     combinedProcessMb,
                     backendTrackedMb
@@ -741,8 +861,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     result.before.mlxTrackedMemoryMb,
                     result.after.mlxTrackedMemoryMb
                 )
+                self.scheduleCombinedMemoryCheckAfterIdle()
             }
         }
+    }
+
+    private var hasRecentLocalASRModelReleaseRequest: Bool {
+        guard let lastLocalASRModelReleaseRequestAt else { return false }
+        return Date().timeIntervalSince(lastLocalASRModelReleaseRequestAt) < 30
     }
 
     private func requestBackendRestart(reason: String) {
@@ -807,11 +933,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let url = URL(string: "http://127.0.0.1:8001/health")!
         var request = URLRequest(url: url, timeoutInterval: 3)
         request.httpMethod = "GET"
+        configureBackendIdentityHeader(&request)
 
-        URLSession.shared.dataTask(with: request) { [weak self] data, _, _ in
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, _ in
             guard let self else { return }
             var isHealthy = false
-            if let data,
+            if self.isExpectedBackendResponse(response),
+               let data,
                let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                let modelLoaded = json["modelLoaded"] as? Bool,
                let asrLoaded = json["asrLoaded"] as? Bool {
@@ -904,6 +1032,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let url = URL(string: "http://127.0.0.1:8001/health")!
         var request = URLRequest(url: url, timeoutInterval: 3)
         request.httpMethod = "GET"
+        configureBackendIdentityHeader(&request)
 
         URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             guard let self = self else { return }
@@ -911,7 +1040,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             // Server not yet responding — that's OK during startup
             if error != nil { return }
 
-            guard let data = data,
+            guard self.isExpectedBackendResponse(response),
+                  let data = data,
                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                   let modelLoaded = json["modelLoaded"] as? Bool,
                   let asrLoaded = json["asrLoaded"] as? Bool else {

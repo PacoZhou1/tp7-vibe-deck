@@ -11,14 +11,15 @@ MACOS_DIR = $(CONTENTS)/MacOS
 RESOURCES = $(CONTENTS)/Resources
 APP_EXECUTABLE = $(MACOS_DIR)/$(EXECUTABLE_NAME)
 BACKEND_SOURCE ?= backend
-BACKEND_RUNTIME_SOURCE ?= ../openspeech-dev/backend
+BACKEND_RUNTIME_SOURCE ?= backend-runtime
 BUNDLED_BACKEND = $(RESOURCES)/backend
-QWEN3_ASR_MODEL_SOURCE ?= /Users/paco/Documents/LLM-Models/Qwen3-ASR-1.7B-4bit
+QWEN3_ASR_MODEL_SOURCE ?= models/Qwen3-ASR-1.7B-4bit
 QWEN3_ASR_MODEL_BUNDLE_NAME = qwen3-asr-1.7b-4bit
 QWEN3_ASR_MODEL_BUNDLE = $(RESOURCES)/$(QWEN3_ASR_MODEL_BUNDLE_NAME)
 SWIFTPM_BINARY = .build/$(SPM_CONFIG)/$(EXECUTABLE_NAME)
 SWIFTPM_METALLIB = .build/$(SPM_CONFIG)/mlx.metallib
 SPEECH_SWIFT_METALLIB_SCRIPT = scripts/build_mlx_metallib.sh
+NESTED_CODESIGN_SCRIPT = scripts/codesign_nested_macho.sh
 
 ICON_SOURCE = Resources/AppIcon-Source.png
 ICON_ICNS = Resources/AppIcon.icns
@@ -94,7 +95,10 @@ codesign-app: bundle-model bundle-backend
 		codesign --force --deep -s - "$(APP_BUNDLE)"; \
 		echo "Ad-hoc signed $(APP_BUNDLE)"; \
 	else \
-		codesign --force --deep --timestamp --options runtime --entitlements "$(ENTITLEMENTS)" \
+		set -e; \
+		test -x "$(NESTED_CODESIGN_SCRIPT)" || (echo "Missing nested code-sign script: $(NESTED_CODESIGN_SCRIPT)" && exit 1); \
+		"$(NESTED_CODESIGN_SCRIPT)" "$(CONTENTS)" "$(CODESIGN_IDENTITY)" "$(APP_EXECUTABLE)"; \
+		codesign --force --timestamp --options runtime --entitlements "$(ENTITLEMENTS)" \
 			--sign "$(CODESIGN_IDENTITY)" "$(APP_BUNDLE)"; \
 		echo "Developer ID signed $(APP_BUNDLE)"; \
 	fi
