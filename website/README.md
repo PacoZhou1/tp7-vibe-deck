@@ -59,5 +59,5 @@ TP-7 product imagery source: teenage engineering press images, `https://teenage.
 ## Deploy
 
 Serve this directory as the web root for `https://openspeech.bumiaoai.com/`.
-Publish the Open Speech ASR DMG through the GitHub Release assets. GitHub's per-asset limit requires the full local-model DMG to be uploaded as numbered parts.
+Publish the Open Speech ASR DMG through the GitHub Release assets. GitHub's per-asset limit requires the full local-model DMG to be uploaded as numbered parts plus `Open-Speech-ASR.dmg.sha256`; the website download button points to the Release page where users can download and reassemble them.
 Upload the TP-7 DMG to `downloads/TP7VibeInput-2026-06-23.dmg`.

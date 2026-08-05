@@ -1,6 +1,6 @@
 # Open Speech ASR
 
-Open Speech ASR is a native macOS voice-input app for turning speech into clean text anywhere you can type. It is an open-source continuation of the OpenSpeech/FreeFlow line, rebuilt around a local-first Apple Silicon pipeline.
+Open Speech ASR is a native macOS voice-input app for turning speech into clean text anywhere you can type. It is an open-source continuation of the OpenSpeech/FreeFlow line, rebuilt around a local Apple Silicon pipeline: the app, recognition, correction, and privacy boundary live on your Mac.
 
 The core promise is simple: speak, get polished text, keep your data on your Mac.
 
@@ -29,6 +29,12 @@ The repository also includes the companion TP-7 Vibe Deck workflow. These screen
 
 Local-first does not mean provider-blind. When `第三方 API` mode is selected, audio or text is sent to the endpoint configured by the user. That mode is explicit and separate from the local modes.
 
+## Native + Local by Design
+
+“Native” means this is a real macOS application, not an Electron shell or a browser wrapper. The menu-bar app, recording path, global shortcuts, permissions, pasteboard, settings, and secure credential storage use Swift, SwiftUI, AppKit, AVAudioEngine, macOS Input Monitoring, and Keychain APIs.
+
+“Local” means the default product path does not require an Open Speech account, developer-operated server, telemetry pipeline, or cloud transcription service. Qwen3-ASR runs in the Swift process through MLX Swift and Metal; optional Gemma correction runs from the bundled local backend on the same Mac. The only exception is the clearly labelled third-party API mode, which is opt-in and sends data only to the provider configured by the user.
+
 ## Features
 
 - System-wide dictation into the active text field.
@@ -38,7 +44,7 @@ Local-first does not mean provider-blind. When `第三方 API` mode is selected,
 - Output-language conversion when requested by the selected prompt.
 - Three engine modes with synchronized frontend and backend state.
 - Configurable global shortcuts and microphone selection.
-- First-run guidance for microphone, accessibility, shortcut, and transcription setup.
+- First-run guidance for microphone, Input Monitoring, shortcut, and transcription setup.
 - Memory cleanup at the combined local MLX budget and a guarded restart fallback at the hard limit.
 - Optional OpenAI-compatible third-party transcription and LLM endpoints.
 
@@ -78,7 +84,7 @@ The default Qwen path does not load SenseVoice. The legacy `SenseVoice + Gemma E
 
 - macOS 15 or newer.
 - Apple Silicon Mac recommended for local MLX inference.
-- Microphone and Accessibility permissions for full dictation behavior.
+- Microphone and Input Monitoring permissions for full dictation behavior; Screen Recording is optional for context-aware features.
 - About 8GB or more of available memory for Qwen3-ASR plus local Gemma correction.
 
 The model weights are intentionally not committed to this repository. The release DMG contains the tested model bundle; source builds must provide model directories locally.
@@ -133,7 +139,7 @@ This repository does not include model weights, personal settings, signing certi
 
 ## Open Source
 
-The project is released under the MIT License. Contributions are welcome, especially around native macOS input behavior, MLX memory management, model-provider abstractions, accessibility, and packaging.
+The project is released under the MIT License. Contributions are welcome, especially around native macOS input behavior, MLX memory management, model-provider abstractions, permissions, and packaging.
 
 Please read [LICENSE](LICENSE) before redistributing the application or its bundled model files. Model weights and third-party libraries remain subject to their own licenses and terms.
 
