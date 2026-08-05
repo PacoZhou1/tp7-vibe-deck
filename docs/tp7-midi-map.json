@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "device": "Teenage Engineering TP-7",
+  "requiredDeviceMode": "ctrl",
+  "midiChannel": 1,
+  "buttonEncoding": {
+    "type": "controlChange",
+    "press": "nonZero",
+    "release": 0
+  },
+  "controls": [
+    { "role": "rec", "label": "REC", "type": "cc", "controller": 22 },
+    { "role": "play", "label": "PLAY", "type": "cc", "controller": 23 },
+    { "role": "stop", "label": "STOP", "type": "cc", "controller": 24 },
+    { "role": "minus", "label": "-", "type": "cc", "controller": 25 },
+    { "role": "plus", "label": "+", "type": "cc", "controller": 26 },
+    { "role": "memo", "label": "Memo", "type": "cc", "controller": 27 },
+    { "role": "menu", "label": "Menu", "type": "cc", "controller": 28 },
+    {
+      "role": "wheel",
+      "label": "Main wheel",
+      "type": "relativeCc",
+      "controller": 30,
+      "decode": "value < 64 ? value : value - 128"
+    },
+    {
+      "role": "sideRocker",
+      "label": "Side forward/back rocker",
+      "type": "pitchBend",
+      "decode": "(lsb | (msb << 7)) - 8192",
+      "center": 0,
+      "positiveRole": "sideForward",
+      "negativeRole": "sideBackward",
+      "requiresDirectionCalibration": true
+    }
+  ],
+  "portingRules": {
+    "ignoreWheelValue": 0,
+    "sideRockerCenterStopsContinuousAction": true,
+    "oneShotActionsFireOnPressOnly": true,
+    "unknownControlsRequireLearnMode": true
+  }
+}

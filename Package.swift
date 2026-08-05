@@ -1,36 +1,44 @@
-// swift-tools-version: 5.10
+// swift-tools-version: 5.9
+
 import PackageDescription
 
 let package = Package(
-    name: "Open Speech ASR",
-    platforms: [.macOS("15.0")],
-    products: [
-        .executable(name: "OpenSpeechASR", targets: ["OpenSpeechASR"]),
-        .executable(name: "asr-smoke-test", targets: ["ASRSmokeTest"])
+    name: "TP7VibeInput",
+    platforms: [
+        .macOS(.v14)
     ],
-    dependencies: [
-        .package(url: "https://github.com/ml-explore/mlx-swift", from: "0.30.0"),
-        .package(url: "https://github.com/soniqo/speech-swift.git", branch: "main")
+    products: [
+        .executable(name: "TP7VibeInput", targets: ["TP7VibeInput"]),
+        .executable(name: "TP7MIDICapture", targets: ["TP7MIDICapture"])
     ],
     targets: [
         .executableTarget(
-            name: "OpenSpeechASR",
-            dependencies: [
-                .product(name: "MLX", package: "mlx-swift"),
-                .product(name: "Qwen3ASR", package: "speech-swift")
+            name: "TP7VibeInput",
+            path: "Sources/TP7VibeInput",
+            resources: [
+                .process("Resources")
             ],
-            path: "Sources",
-            exclude: [],
-            swiftSettings: [
-                .unsafeFlags(["-parse-as-library"])
+            linkerSettings: [
+                .linkedFramework("AppKit"),
+                .linkedFramework("AVFoundation"),
+                .linkedFramework("Carbon"),
+                .linkedFramework("CoreAudio"),
+                .linkedFramework("CoreGraphics"),
+                .linkedFramework("CoreMIDI"),
+                .linkedFramework("IOKit"),
+                .linkedFramework("SceneKit"),
+                .linkedFramework("ServiceManagement"),
+                .linkedFramework("SwiftUI")
             ]
         ),
         .executableTarget(
-            name: "ASRSmokeTest",
-            dependencies: [
-                .product(name: "Qwen3ASR", package: "speech-swift")
-            ],
-            path: "Tools/ASRSmokeTest"
+            name: "TP7MIDICapture",
+            path: "Sources/TP7MIDICapture",
+            linkerSettings: [
+                .linkedFramework("AppKit"),
+                .linkedFramework("CoreMIDI"),
+                .linkedFramework("SwiftUI")
+            ]
         )
     ]
 )

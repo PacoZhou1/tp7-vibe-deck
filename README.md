@@ -1,148 +1,129 @@
-# Open Speech ASR
+# TP7 Vibe Deck
 
-Open Speech ASR is a native macOS voice-input app for turning speech into clean text anywhere you can type. It is an open-source continuation of the OpenSpeech/FreeFlow line, rebuilt around a local Apple Silicon pipeline: the app, recognition, correction, and privacy boundary live on your Mac.
+TP7 Vibe Deck is a native macOS control deck for Teenage Engineering TP-7. It turns the TP-7's physical buttons, side controls, wheel, audio input, and MIDI events into a configurable command surface for creative work, dictation, coding, and hardware workflows.
 
-The core promise is simple: speak, get polished text, keep your data on your Mac.
-
-![Open Speech ASR app icon](website/assets/open-speech-app-icon.png)
+![TP7 Vibe Deck app icon](assets/tp7-vibe-deck-icon.png)
 
 ## Product Preview
 
-Open Speech can be mapped into a hardware or automation workflow through configurable shortcuts and presets:
+![TP7 Vibe Deck overview](assets/tp7-vibe-deck-overview.png)
 
-![Open Speech shortcut mapping](website/assets/github-shortcut-mapping.png)
+![TP7 Vibe Deck mapping](assets/tp7-vibe-deck-mapping.png)
 
-The repository also includes the companion TP-7 Vibe Deck workflow. These screenshots show the optional controller console, not the core Open Speech speech engine:
+The app provides a live TP-7 device view, connection status, MIDI event history, recording controls, mapping profiles, wheel tuning, and quick actions from one focused macOS interface.
 
-![TP-7 Vibe Deck overview](website/assets/github-tp7-vibe-deck-overview.png)
+## Why It Is Native
 
-![TP-7 Vibe Deck mapping](website/assets/github-tp7-vibe-deck-mapping.png)
-
-## Why It Is Different
-
-- **macOS-native experience**: Swift, SwiftUI, AppKit, AVAudioEngine, global shortcuts, menu-bar controls, Keychain storage, and native accessibility integration.
-- **Local by default**: the default ASR and correction path runs on the Mac. Audio and transcripts do not need to leave the device.
-- **Native ASR inference**: Qwen3-ASR runs inside the Swift process through MLX Swift and `speech-swift`, with a precompiled Metal shader library for fast Apple GPU inference.
-- **Local text correction**: bundled Gemma E4B applies prompt presets, punctuation, vocabulary, and output-language rules locally through the optional bundled MLX backend.
-- **Replaceable engines**: users can choose `Qwen3-ASR + Gemma E4B`, `SenseVoice + Gemma E4B`, or a configured third-party API.
-- **Designed for repeated dictation**: model lifecycle control, cache cleanup, combined memory budgeting, stale-process protection, and a first-run setup flow are built into the app.
-
-Local-first does not mean provider-blind. When `第三方 API` mode is selected, audio or text is sent to the endpoint configured by the user. That mode is explicit and separate from the local modes.
-
-## Native + Local by Design
-
-“Native” means this is a real macOS application, not an Electron shell or a browser wrapper. The menu-bar app, recording path, global shortcuts, permissions, pasteboard, settings, and secure credential storage use Swift, SwiftUI, AppKit, AVAudioEngine, macOS Input Monitoring, and Keychain APIs.
-
-“Local” means the default product path does not require an Open Speech account, developer-operated server, telemetry pipeline, or cloud transcription service. Qwen3-ASR runs in the Swift process through MLX Swift and Metal; optional Gemma correction runs from the bundled local backend on the same Mac. The only exception is the clearly labelled third-party API mode, which is opt-in and sends data only to the provider configured by the user.
+- **Real macOS app:** SwiftUI and AppKit, with no Electron shell or browser runtime.
+- **Direct hardware access:** CoreMIDI reads TP-7 controller events and AVFoundation opens its audio input directly.
+- **Low-latency interaction:** MIDI events are normalized in the app and dispatched to native macOS actions.
+- **Local by default:** device state, mappings, recordings, and control dispatch stay on the Mac.
+- **Open and inspectable:** the complete SwiftPM source, model assets, MIDI evidence, safety notes, and build scripts are included.
 
 ## Features
 
-- System-wide dictation into the active text field.
-- Chinese and English transcription with Qwen3-ASR 1.7B 4-bit.
-- Local Gemma E4B correction with editable prompt presets.
-- Custom vocabulary and context-aware cleanup.
-- Output-language conversion when requested by the selected prompt.
-- Three engine modes with synchronized frontend and backend state.
-- Configurable global shortcuts and microphone selection.
-- First-run guidance for microphone, Input Monitoring, shortcut, and transcription setup.
-- Memory cleanup at the combined local MLX budget and a guarded restart fallback at the hard limit.
-- Optional OpenAI-compatible third-party transcription and LLM endpoints.
+- TP-7 audio and MIDI connection monitoring.
+- Confirmed REC, PLAY, STOP, wheel, side-control, and learned-input handling.
+- Persistent mapping profiles for Open Speech, keyboard commands, scroll, volume, brightness, and custom shortcuts.
+- Menu bar extra for quick status and commands.
+- SceneKit TP-7 model with clickable control hotspots.
+- TP-7 audio warmup to reduce first-recording latency.
+- Microphone and Accessibility permission entry points with live status refresh.
+- MIDI recovery when macOS invalidates a CoreMIDI connection.
+- JSON MIDI capture utility for hardware calibration and regression evidence.
+- Optional Open Speech preset and shortcut integration; the controller remains useful without it.
 
 ## Architecture
 
 ```text
-Microphone
-   |
-   v
-Swift / AVAudioEngine / Qwen3ASRProvider
-   |  Qwen3-ASR inference in-process via MLX Swift
-   v
-Raw transcript
-   |
-   +--> local Gemma E4B correction (optional, bundled backend)
-   |
-   +--> third-party API correction (explicit user-selected mode)
-   v
-Clean text pasted into the active macOS application
+TP-7 USB audio + CoreMIDI
+          |
+          v
+  TP7DeviceMonitor / TP7MIDIListener
+          |
+          v
+    TP7MappingProfile
+          |
+          v
+  Native action adapters
+  (shortcuts, Return, scroll, volume, brightness, recording)
 ```
 
-The default Qwen path does not load SenseVoice. The legacy `SenseVoice + Gemma E4B` option remains available for compatibility. The local correction backend listens on `127.0.0.1:8001` and is started only when a local Gemma mode needs it.
+The mapping layer is deliberately separate from device discovery and action dispatch. That makes it possible to add another controller or a future SEM adapter without changing the TP-7 event protocol.
 
 ## Technology Stack
 
 | Layer | Technology |
 | --- | --- |
-| App shell | Swift 5.10, SwiftUI, AppKit, Swift Package Manager |
-| Audio and input | AVAudioEngine, macOS Accessibility APIs, global shortcut handling |
-| Native ASR | `speech-swift` `Qwen3ASR`, MLX Swift, Qwen3-ASR 1.7B 4-bit |
-| GPU runtime | Apple Metal through MLX, precompiled `mlx.metallib` |
-| Local correction | Bundled Python 3.13 runtime, MLX-based Gemma E4B backend, Uvicorn/FastAPI endpoints |
-| Secure settings | macOS Keychain and UserDefaults for non-secret preferences |
-| Distribution | Developer ID signing, Apple notarization, stapled DMG |
-
-## Requirements
-
-- macOS 15 or newer.
-- Apple Silicon Mac recommended for local MLX inference.
-- Microphone and Input Monitoring permissions for full dictation behavior; Screen Recording is optional for context-aware features.
-- About 8GB or more of available memory for Qwen3-ASR plus local Gemma correction.
-
-The model weights are intentionally not committed to this repository. The release DMG contains the tested model bundle; source builds must provide model directories locally.
-
-## Build From Source
-
-Install Xcode Command Line Tools and Swift Package Manager dependencies, then provide the local Qwen model directory:
-
-```bash
-make all \
-  QWEN3_ASR_MODEL_SOURCE=/path/to/Qwen3-ASR-1.7B-4bit \
-  BACKEND_RUNTIME_SOURCE=/path/to/compatible/backend-runtime
-```
-
-The Qwen directory must contain `model.safetensors`, `vocab.json`, and `merges.txt`. The backend runtime directory must contain the Python runtime and any local Gemma model resources expected by `backend/inference_server.py`.
-
-The build invokes `scripts/build_mlx_metallib.sh` and places the resulting `mlx.metallib` beside the app executable. Do not skip shader precompilation: without it, MLX can fall back to runtime shader compilation and inference can become several times slower.
-
-Run the native ASR smoke test against a real audio file:
-
-```bash
-swift build -c release --disable-sandbox
-.build/release/asr-smoke-test path/to/audio.aiff /path/to/Qwen3-ASR-1.7B-4bit zh
-```
-
-Create a local package:
-
-```bash
-make dmg \
-  QWEN3_ASR_MODEL_SOURCE=/path/to/Qwen3-ASR-1.7B-4bit \
-  BACKEND_RUNTIME_SOURCE=/path/to/compatible/backend-runtime
-```
-
-For distribution signing, set `CODESIGN_IDENTITY` to a Developer ID Application identity. The release workflow additionally uses `xcrun notarytool` and `stapler`.
+| App UI | SwiftUI, AppKit, macOS menu bar extra |
+| Package/build | Swift 5.9+, Swift Package Manager |
+| Audio | AVFoundation, CoreAudio |
+| MIDI | CoreMIDI |
+| 3D device view | SceneKit, USDZ, GLB, SceneKit assets |
+| Native actions | CoreGraphics, AppKit, ServiceManagement |
+| Persistence | UserDefaults and JSON mapping profiles |
+| Distribution | macOS app bundle, DMG packaging, code-sign verification |
 
 ## Download
 
-Use the [latest GitHub Release](https://github.com/PacoZhou1/open-speech-asr/releases/latest) for the notarized macOS build and release notes.
+Download the latest **TP7 Vibe Deck** DMG from the [GitHub Releases page](https://github.com/PacoZhou1/tp7-vibe-deck/releases/latest).
 
-The full local model bundle is larger than GitHub's 2GiB per-release-asset limit, so the DMG is published as numbered parts with a SHA-256 file. Download every `Open-Speech-ASR.dmg.part-*` asset into one directory and join them in lexical order:
+The release also includes the dated source archive used to build the reference app. The DMG is the standalone macOS app; the repository source is the editable SwiftPM project.
+
+## Build From Source
+
+Requirements:
+
+- macOS 14 or newer.
+- Xcode Command Line Tools or Xcode with Swift 5.9 or newer.
+- A Teenage Engineering TP-7 for hardware validation. The app can still build and open without one connected.
+
+Build and stage the app bundle:
 
 ```bash
-cat Open-Speech-ASR.dmg.part-* > "Open-Speech-ASR.dmg"
-shasum -a 256 -c Open-Speech-ASR.dmg.sha256
+./script/build_and_run.sh bundle
 ```
 
-## Privacy
+Build and launch it:
 
-Local modes keep recognition and correction on the Mac. API mode is opt-in and uses the endpoint, model, and credentials configured by the user. API credentials are stored through the macOS Keychain rather than committed to the repository.
+```bash
+./script/build_and_run.sh run
+```
 
-This repository does not include model weights, personal settings, signing certificates, notarization credentials, or user audio.
+Create a local DMG:
+
+```bash
+./script/package_dmg.sh "$PWD/dist/TP7VibeDeck.dmg"
+```
+
+The scripts use the product name `TP7 Vibe Deck`, bundle identifier `com.paco.TP7VibeInput`, and minimum macOS version 14.0.
+
+## TP-7 Setup
+
+For controller events, put the TP-7 into `MODE -> MIDI -> ctrl`. In the confirmed setup:
+
+- REC emits CC 22.
+- PLAY emits CC 23.
+- STOP emits CC 24.
+- The wheel emits relative CC 30 data.
+
+Read [TP7_MIDI_PROTOCOL.md](docs/TP7_MIDI_PROTOCOL.md) for the complete protocol and [tp7-midi-map.json](docs/tp7-midi-map.json) for the machine-readable map. Use [SEM_CONTROL_SAFETY.md](docs/SEM_CONTROL_SAFETY.md) before connecting any microscope control adapter.
+
+## Privacy And Safety
+
+TP7 Vibe Deck does not require a cloud service. Hardware status, mappings, MIDI events, and recordings are handled locally. The Open Speech bridge only reads the explicitly documented local defaults domain and posts local notifications.
+
+The included SEM documents are integration guidance, not a vendor SDK or authorization to operate a microscope. Keep live instrument commands behind an explicit adapter and simulated mode while testing.
+
+## Asset Attribution
+
+The bundled TP-7 model is `Teenage engineering tp 7` by Denis Nikolaichuk on BlenderKit / Blendkit:
+<https://www.blendkit.com/asset-gallery-detail/034033a1-1f83-46f4-ba49-f26cd83c6149/>
+
+The model was converted to SceneKit assets for native macOS rendering. The original GLB is retained in the source package for provenance.
 
 ## Open Source
 
-The project is released under the MIT License. Contributions are welcome, especially around native macOS input behavior, MLX memory management, model-provider abstractions, permissions, and packaging.
+This project is released under the MIT License. The model asset and any linked third-party content remain subject to their own licenses and attribution requirements.
 
-Please read [LICENSE](LICENSE) before redistributing the application or its bundled model files. Model weights and third-party libraries remain subject to their own licenses and terms.
-
-## Known Limitation
-
-The current local correction backend uses `127.0.0.1:8001`. If another local service already owns that port, quit the conflicting service before starting a local Gemma mode. Dynamic backend-port allocation is a planned follow-up.
+Contributions are welcome around MIDI normalization, mapping profiles, native macOS interaction, device recovery, accessibility, and safe hardware adapters.
