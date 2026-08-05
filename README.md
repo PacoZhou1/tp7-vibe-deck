@@ -127,7 +127,7 @@ Use the [latest GitHub Release](https://github.com/PacoZhou1/open-speech-asr/rel
 The full local model bundle is larger than GitHub's 2GiB per-release-asset limit, so the DMG is published as numbered parts with a SHA-256 file. Download every `Open-Speech-ASR.dmg.part-*` asset into one directory and join them in lexical order:
 
 ```bash
-cat Open-Speech-ASR.dmg.part-* > "Open Speech ASR.dmg"
+cat Open-Speech-ASR.dmg.part-* > "Open-Speech-ASR.dmg"
 shasum -a 256 -c Open-Speech-ASR.dmg.sha256
 ```
 
