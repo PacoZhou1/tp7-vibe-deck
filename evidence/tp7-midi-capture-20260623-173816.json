@@ -1,0 +1,1706 @@
+[
+  {
+    "deltaMilliseconds" : 2856.4330339431763,
+    "endpointName" : "MARK",
+    "id" : "41062A7D-C97D-4DEE-B217-AB57FE9B5673",
+    "index" : 122,
+    "kind" : "marker",
+    "label" : "Down",
+    "rawBytes" : [
+
+    ],
+    "timestamp" : "2026-06-23T09:37:02Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1420.6069707870483,
+    "endpointName" : "TP-7",
+    "id" : "9AB9A99A-6A0D-4D08-9F30-A55413F919BC",
+    "index" : 121,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      0,
+      64
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1404.6130180358887,
+    "endpointName" : "TP-7",
+    "id" : "806809BC-6071-4B8C-A2E8-D66DF594DBEE",
+    "index" : 120,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      123,
+      63
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1387.1500492095947,
+    "endpointName" : "TP-7",
+    "id" : "3BB85F9B-9200-4FE9-B7FA-B7102C11A164",
+    "index" : 119,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      15,
+      63
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1378.2910108566284,
+    "endpointName" : "TP-7",
+    "id" : "33FECD7E-C86B-46EB-802D-B566B4786F8F",
+    "index" : 118,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      120,
+      61
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1366.6199445724487,
+    "endpointName" : "TP-7",
+    "id" : "5702BA29-B967-4D01-AE98-A98A83BD3D79",
+    "index" : 117,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      20,
+      61
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1354.6079397201538,
+    "endpointName" : "TP-7",
+    "id" : "5AF998B2-AB29-4016-9D2F-4AB0116251B2",
+    "index" : 116,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      32,
+      60
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1344.1070318222046,
+    "endpointName" : "TP-7",
+    "id" : "610D4555-8C34-419F-A8C5-A20F1D9D4B3F",
+    "index" : 115,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      28,
+      59
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1344.0749645233154,
+    "endpointName" : "TP-7",
+    "id" : "732939B8-1CCE-4590-8617-7121AF9C551A",
+    "index" : 114,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      8,
+      58
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1331.9129943847656,
+    "endpointName" : "TP-7",
+    "id" : "52B1C131-A542-4825-B4B5-CFC2FDF7CBC2",
+    "index" : 113,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      100,
+      56
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1320.0700283050537,
+    "endpointName" : "TP-7",
+    "id" : "9C10EB8C-E371-4D59-A2C6-E07204B3D7A3",
+    "index" : 112,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      48,
+      55
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1310.845971107483,
+    "endpointName" : "TP-7",
+    "id" : "04BE9EBD-4CF9-4AB8-94D5-038C4174CDAC",
+    "index" : 111,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      108,
+      53
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1310.8199834823608,
+    "endpointName" : "TP-7",
+    "id" : "2026256E-485F-493F-B49D-B175DFA49AA0",
+    "index" : 110,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      25,
+      52
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1302.2799491882324,
+    "endpointName" : "TP-7",
+    "id" : "8927E044-F3EF-46A1-A1FA-F36170628122",
+    "index" : 109,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      53,
+      50
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1290.5839681625366,
+    "endpointName" : "TP-7",
+    "id" : "556866D4-2ED4-499C-A4C0-DB8E67A99C46",
+    "index" : 108,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      65,
+      48
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1277.5980234146118,
+    "endpointName" : "TP-7",
+    "id" : "6F9FAF82-AACC-4E5C-9B6E-F696C1C2065E",
+    "index" : 107,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      61,
+      46
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1277.5750160217285,
+    "endpointName" : "TP-7",
+    "id" : "F5B72882-0586-4925-8FA2-1141EE0E5343",
+    "index" : 106,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      41,
+      44
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1265.6179666519165,
+    "endpointName" : "TP-7",
+    "id" : "535FF83D-E1AC-44E2-A3FA-36D36B1BFC1C",
+    "index" : 105,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      5,
+      42
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1255.679965019226,
+    "endpointName" : "TP-7",
+    "id" : "60B78723-D875-4993-908D-A482FC7E3575",
+    "index" : 104,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      81,
+      39
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1255.6480169296265,
+    "endpointName" : "TP-7",
+    "id" : "315EE5A1-9F3B-4B78-8423-FC7B1B2737DE",
+    "index" : 103,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      13,
+      37
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1243.636965751648,
+    "endpointName" : "TP-7",
+    "id" : "BA89F259-8043-472D-B062-BA8E9E1657F6",
+    "index" : 102,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      57,
+      34
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1229.964017868042,
+    "endpointName" : "TP-7",
+    "id" : "53C5419C-5AC3-43F1-B894-B4FB5828DB24",
+    "index" : 101,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      86,
+      31
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1229.943037033081,
+    "endpointName" : "TP-7",
+    "id" : "FE2A10DD-AAFC-4259-A153-52E8F56F5FEE",
+    "index" : 100,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      98,
+      28
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1216.6780233383179,
+    "endpointName" : "TP-7",
+    "id" : "AFC3AE9C-83F7-484C-B932-BB9C9B999829",
+    "index" : 99,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      94,
+      25
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1216.6529893875122,
+    "endpointName" : "TP-7",
+    "id" : "50108EA6-FC89-4F15-B9C7-A26ABC051B8C",
+    "index" : 98,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      74,
+      22
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1207.453966140747,
+    "endpointName" : "TP-7",
+    "id" : "F8FE2E97-2EF8-47DF-8FFA-F5F66CAC2B13",
+    "index" : 97,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      38,
+      19
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1194.2930221557617,
+    "endpointName" : "TP-7",
+    "id" : "845F3751-CA87-4F79-AFE2-9C6E96E0F9D9",
+    "index" : 96,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      114,
+      15
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1184.2809915542603,
+    "endpointName" : "TP-7",
+    "id" : "7CFE0C38-975C-4B2C-AFF2-C94BC3D364A7",
+    "index" : 95,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      46,
+      12
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1184.2520236968994,
+    "endpointName" : "TP-7",
+    "id" : "FE50E539-28BD-4427-85D4-2DEBC19A87F8",
+    "index" : 94,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      90,
+      8
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1172.518014907837,
+    "endpointName" : "TP-7",
+    "id" : "08169607-D458-4A53-8EBF-C927658B1605",
+    "index" : 93,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      119,
+      4
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1159.6239805221558,
+    "endpointName" : "TP-7",
+    "id" : "139480A8-0B11-492B-85AB-956F0C26352F",
+    "index" : 92,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      89,
+      1
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1021.2709903717041,
+    "endpointName" : "TP-7",
+    "id" : "8DAC9F0E-388F-43B3-805D-4BFEAEAF3783",
+    "index" : 91,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      0,
+      0
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1010.0359916687012,
+    "endpointName" : "TP-7",
+    "id" : "30C9C369-6A0A-4D4D-A5D2-03F2899C1922",
+    "index" : 90,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      58,
+      0
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1001.9209384918213,
+    "endpointName" : "TP-7",
+    "id" : "4DA23EB3-817C-40BD-BB58-A1315A319B77",
+    "index" : 89,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      104,
+      1
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 989.4289970397949,
+    "endpointName" : "TP-7",
+    "id" : "10785D72-2247-49BA-B907-B9685318D257",
+    "index" : 88,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      20,
+      4
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 989.4050359725952,
+    "endpointName" : "TP-7",
+    "id" : "983A6C99-489D-4444-AEB9-70D2E94F5EDD",
+    "index" : 87,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      123,
+      7
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 977.7120351791382,
+    "endpointName" : "TP-7",
+    "id" : "BA898C6C-92A0-41A3-B69A-58468FCBDBCF",
+    "index" : 86,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      82,
+      11
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 968.1999683380127,
+    "endpointName" : "TP-7",
+    "id" : "5F7C9433-C36C-4E4E-B93A-90AF4D548B0C",
+    "index" : 85,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      25,
+      15
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 968.1700468063354,
+    "endpointName" : "TP-7",
+    "id" : "E8629032-EFE7-4475-8BF4-AA550D09419A",
+    "index" : 84,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      80,
+      18
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 956.3280344009399,
+    "endpointName" : "TP-7",
+    "id" : "CC16548D-CCC9-46F4-B8B0-F143B98ED4EE",
+    "index" : 83,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      119,
+      21
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 943.4620141983032,
+    "endpointName" : "TP-7",
+    "id" : "E9DEF857-53EF-4BDA-88AF-FB2BB3D6CBBF",
+    "index" : 82,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      14,
+      25
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 943.43101978302,
+    "endpointName" : "TP-7",
+    "id" : "834426EC-A0A6-4271-B969-3055D79BC8A7",
+    "index" : 81,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      21,
+      28
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 932.3070049285889,
+    "endpointName" : "TP-7",
+    "id" : "9059EE06-577A-4CF5-AFE6-8E1580DBF09B",
+    "index" : 80,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      13,
+      31
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 921.1390018463135,
+    "endpointName" : "TP-7",
+    "id" : "62E67168-61BE-411D-B786-59F6C3AE38FF",
+    "index" : 79,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      116,
+      33
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 913.3670330047607,
+    "endpointName" : "TP-7",
+    "id" : "4F02121A-4F30-4992-8AA3-1EE291128767",
+    "index" : 78,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      75,
+      36
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 905.2009582519531,
+    "endpointName" : "TP-7",
+    "id" : "EF280095-521C-4FEF-BCDA-496A9E23BAEA",
+    "index" : 77,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      18,
+      39
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 893.0610418319702,
+    "endpointName" : "TP-7",
+    "id" : "77A81D5E-EAA4-488B-8987-CA3CF9F78C90",
+    "index" : 76,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      73,
+      41
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 893.0449485778809,
+    "endpointName" : "TP-7",
+    "id" : "865C15C3-E16D-4FDD-B0F1-838ED71F2F62",
+    "index" : 75,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      112,
+      43
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 880.7679414749146,
+    "endpointName" : "TP-7",
+    "id" : "5FE5EA07-09B0-4791-B073-55F0D744B50F",
+    "index" : 74,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      7,
+      46
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 880.7400465011597,
+    "endpointName" : "TP-7",
+    "id" : "AA128531-9424-4CCA-9D6B-6281599D87D1",
+    "index" : 73,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      14,
+      48
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 866.832971572876,
+    "endpointName" : "TP-7",
+    "id" : "0EDC558E-9314-4908-A245-A320729FF246",
+    "index" : 72,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      5,
+      50
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 866.8069839477539,
+    "endpointName" : "TP-7",
+    "id" : "195120D2-B860-4AEA-8985-6F26F31B92F7",
+    "index" : 71,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      108,
+      51
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 855.3769588470459,
+    "endpointName" : "TP-7",
+    "id" : "FB3AEB05-A992-4C2D-BF73-BDF09F5B89B1",
+    "index" : 70,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      67,
+      53
+    ],
+    "timestamp" : "2026-06-23T09:37:00Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 843.1919813156128,
+    "endpointName" : "TP-7",
+    "id" : "473C89D6-D4FB-4C7F-8FF5-B32C31FEE592",
+    "index" : 69,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      10,
+      55
+    ],
+    "timestamp" : "2026-06-23T09:36:59Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 828.9569616317749,
+    "endpointName" : "TP-7",
+    "id" : "A6E23E33-FC6F-4F8C-AA32-90788105C4A2",
+    "index" : 68,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      66,
+      56
+    ],
+    "timestamp" : "2026-06-23T09:36:59Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 828.935980796814,
+    "endpointName" : "TP-7",
+    "id" : "FB1E875C-AB37-46C8-B540-47C64E6438FD",
+    "index" : 67,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      105,
+      57
+    ],
+    "timestamp" : "2026-06-23T09:36:59Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 820.7030296325684,
+    "endpointName" : "TP-7",
+    "id" : "250BD3C6-3CD6-4956-AAA9-925420CC8055",
+    "index" : 66,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      0,
+      59
+    ],
+    "timestamp" : "2026-06-23T09:36:59Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 810.8320236206055,
+    "endpointName" : "TP-7",
+    "id" : "2C5AFD80-1EE8-4FD1-8FBE-608DACF0DA4E",
+    "index" : 65,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      7,
+      60
+    ],
+    "timestamp" : "2026-06-23T09:36:59Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 800.894021987915,
+    "endpointName" : "TP-7",
+    "id" : "3362080F-FBBA-4C2C-BA47-4D2F337B31E8",
+    "index" : 64,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      126,
+      60
+    ],
+    "timestamp" : "2026-06-23T09:36:59Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 791.6179895401001,
+    "endpointName" : "TP-7",
+    "id" : "0A3DECE2-C923-4325-A63D-1A99A92FA6B6",
+    "index" : 63,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      101,
+      61
+    ],
+    "timestamp" : "2026-06-23T09:36:59Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 775.6990194320679,
+    "endpointName" : "TP-7",
+    "id" : "5C873289-9573-46E3-B5FA-83E37F31DB93",
+    "index" : 62,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      3,
+      63
+    ],
+    "timestamp" : "2026-06-23T09:36:59Z"
+  },
+  {
+    "deltaMilliseconds" : 6443.089962005615,
+    "endpointName" : "MARK",
+    "id" : "EA8C7FCA-1035-44C6-8AFE-6D670A5C2715",
+    "index" : 61,
+    "kind" : "marker",
+    "label" : "Up",
+    "rawBytes" : [
+
+    ],
+    "timestamp" : "2026-06-23T09:36:50Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1516.435980796814,
+    "endpointName" : "TP-7",
+    "id" : "C9AD1A41-8924-4818-B46A-7F186186B878",
+    "index" : 60,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      0,
+      64
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1500.427007675171,
+    "endpointName" : "TP-7",
+    "id" : "1B02D931-48B9-4FAD-8CA5-84264E65DE97",
+    "index" : 59,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      9,
+      64
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1479.3999195098877,
+    "endpointName" : "TP-7",
+    "id" : "4048B25C-6587-440F-A980-44302503796D",
+    "index" : 58,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      3,
+      65
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1472.133994102478,
+    "endpointName" : "TP-7",
+    "id" : "1488DBD6-B4D2-47EF-B1BB-C24FD06C8C8C",
+    "index" : 57,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      37,
+      66
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1461.8579149246216,
+    "endpointName" : "TP-7",
+    "id" : "F33C0B99-26CB-4BCF-AEE6-5386089B5D4B",
+    "index" : 56,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      14,
+      67
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1451.1590003967285,
+    "endpointName" : "TP-7",
+    "id" : "D27589A0-D0AB-4AAA-9A96-ADEFF97D4D6B",
+    "index" : 55,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      7,
+      68
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1440.9940242767334,
+    "endpointName" : "TP-7",
+    "id" : "8E57909D-700E-46D8-B444-22F94E9B9F6A",
+    "index" : 54,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      16,
+      69
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1433.532953262329,
+    "endpointName" : "TP-7",
+    "id" : "DE32B08E-0F3F-456D-A0EC-3C998FE903C0",
+    "index" : 53,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      41,
+      70
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1426.1260032653809,
+    "endpointName" : "TP-7",
+    "id" : "9D529A74-8582-44A5-8A20-9FFC9B7EFA17",
+    "index" : 52,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      82,
+      71
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1415.3989553451538,
+    "endpointName" : "TP-7",
+    "id" : "2EFD4FE1-A613-484B-8A57-9134054390A5",
+    "index" : 51,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      11,
+      73
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1406.7620038986206,
+    "endpointName" : "TP-7",
+    "id" : "F00CB9C4-30DE-459A-B55E-AE825EB33969",
+    "index" : 50,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      84,
+      74
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1406.7379236221313,
+    "endpointName" : "TP-7",
+    "id" : "4408E82C-3D89-4E78-8403-3B54D8629CEC",
+    "index" : 49,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      45,
+      76
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1396.5729475021362,
+    "endpointName" : "TP-7",
+    "id" : "285FFEC4-1CCF-4196-BAD5-7357A5AD5DF3",
+    "index" : 48,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      22,
+      78
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1386.579990386963,
+    "endpointName" : "TP-7",
+    "id" : "670AC7F2-73BD-4C54-88DB-EA1FE6A90878",
+    "index" : 47,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      15,
+      80
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1379.377007484436,
+    "endpointName" : "TP-7",
+    "id" : "9AD54656-374A-4222-94D4-1916647D4521",
+    "index" : 46,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      24,
+      82
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1372.1150159835815,
+    "endpointName" : "TP-7",
+    "id" : "5B22B429-DF39-4C9B-BA6E-8E9CD6035CA7",
+    "index" : 45,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      49,
+      84
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1361.8580102920532,
+    "endpointName" : "TP-7",
+    "id" : "D5E24204-0C75-4930-9BD2-5CBF26036612",
+    "index" : 44,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      90,
+      86
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1351.4009714126587,
+    "endpointName" : "TP-7",
+    "id" : "09CA6B8E-2456-4A08-9A98-C113DCBC1596",
+    "index" : 43,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      19,
+      89
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1342.8269624710083,
+    "endpointName" : "TP-7",
+    "id" : "9223841D-5BFE-439A-9A5A-DB12112C0B14",
+    "index" : 42,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      92,
+      91
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1342.8019285202026,
+    "endpointName" : "TP-7",
+    "id" : "535D11E5-A384-45B8-8417-3E1247DB8225",
+    "index" : 41,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      53,
+      94
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1332.9849243164062,
+    "endpointName" : "TP-7",
+    "id" : "0A9E9C66-4F4B-4F02-8C9D-08934DCDFAA3",
+    "index" : 40,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      30,
+      97
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1322.7699995040894,
+    "endpointName" : "TP-7",
+    "id" : "E3AFF377-89C4-4B80-9C65-A8C708B7EC45",
+    "index" : 39,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      23,
+      100
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1315.485954284668,
+    "endpointName" : "TP-7",
+    "id" : "0D63F052-D416-4CB5-9D5D-C2FB3FFA03AB",
+    "index" : 38,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      32,
+      103
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1308.061957359314,
+    "endpointName" : "TP-7",
+    "id" : "87D4D7F2-413F-4E89-A092-B9B2DF1DE032",
+    "index" : 37,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      57,
+      106
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1298.1029748916626,
+    "endpointName" : "TP-7",
+    "id" : "8815434B-F6C1-4C01-8474-F6BF7D1964FA",
+    "index" : 36,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      98,
+      109
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1288.3169651031494,
+    "endpointName" : "TP-7",
+    "id" : "46BC558E-BFC2-4CF5-A7AC-812951BF20A5",
+    "index" : 35,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      27,
+      113
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1277.2749662399292,
+    "endpointName" : "TP-7",
+    "id" : "34239372-0DF1-4AB6-BCF3-C30228BB6130",
+    "index" : 34,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      100,
+      116
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1277.2489786148071,
+    "endpointName" : "TP-7",
+    "id" : "87F27FD2-0DD1-4883-9659-B40182CEC5CE",
+    "index" : 33,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      61,
+      120
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1266.6739225387573,
+    "endpointName" : "TP-7",
+    "id" : "3BE69D97-9CC9-4EEE-8BFC-636581DB9E73",
+    "index" : 32,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      38,
+      124
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1255.4149627685547,
+    "endpointName" : "TP-7",
+    "id" : "46856399-D303-4048-BD28-581F9DEFEDA2",
+    "index" : 31,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      105,
+      126
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1228.7479639053345,
+    "endpointName" : "TP-7",
+    "id" : "29BB1C64-22FE-4C85-B724-FCE3EDEC6E59",
+    "index" : 30,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      127,
+      127
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1228.72793674469,
+    "endpointName" : "TP-7",
+    "id" : "DA40AAD5-297E-4C9C-8520-04E2B1F03152",
+    "index" : 29,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      114,
+      126
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1215.6709432601929,
+    "endpointName" : "TP-7",
+    "id" : "0E626312-168A-450C-A099-35D52D19D012",
+    "index" : 28,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      29,
+      125
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1215.6440019607544,
+    "endpointName" : "TP-7",
+    "id" : "71A78B08-FD7E-4075-9981-D5FF4C5A478E",
+    "index" : 27,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      64,
+      122
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1202.299952507019,
+    "endpointName" : "TP-7",
+    "id" : "BE24AD25-4C9E-467F-AAE6-2B775A4812FF",
+    "index" : 26,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      56,
+      119
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1202.2759914398193,
+    "endpointName" : "TP-7",
+    "id" : "92FCEBD7-074E-4F54-8F77-26744C95E985",
+    "index" : 25,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      117,
+      115
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1188.9159679412842,
+    "endpointName" : "TP-7",
+    "id" : "5615E8A9-DD4F-4ADA-AC5B-8D3D5A4E7F28",
+    "index" : 24,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      48,
+      112
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1178.360939025879,
+    "endpointName" : "TP-7",
+    "id" : "BC19C21A-0F52-4C40-B8F1-1CC8200B3DD8",
+    "index" : 23,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      123,
+      108
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1167.9439544677734,
+    "endpointName" : "TP-7",
+    "id" : "E1B6DA8A-85FC-481E-9495-AA1023C49095",
+    "index" : 22,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      86,
+      105
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1160.74800491333,
+    "endpointName" : "TP-7",
+    "id" : "6E5CA117-C8E8-4348-ABE2-0A76CA1DA60E",
+    "index" : 21,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      65,
+      102
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1151.8229246139526,
+    "endpointName" : "TP-7",
+    "id" : "3F97754B-1F86-4900-BAE3-6A786245099A",
+    "index" : 20,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      59,
+      99
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1145.226001739502,
+    "endpointName" : "TP-7",
+    "id" : "1BDD0950-52E7-4803-B672-3A9DFBD1DEBF",
+    "index" : 19,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      70,
+      96
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1136.0210180282593,
+    "endpointName" : "TP-7",
+    "id" : "E15ECECD-6B3B-4A7A-BB4A-1A0B779A5149",
+    "index" : 18,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      97,
+      93
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1127.3959875106812,
+    "endpointName" : "TP-7",
+    "id" : "5F7AFA55-87A6-4CCC-9564-88FDFFF497DB",
+    "index" : 17,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      12,
+      91
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1117.1619892120361,
+    "endpointName" : "TP-7",
+    "id" : "1BB50430-E30F-4D06-9CEF-D6BF91E7F827",
+    "index" : 16,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      71,
+      88
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1111.401915550232,
+    "endpointName" : "TP-7",
+    "id" : "1CAF8B01-AA25-43AE-B871-901078543390",
+    "index" : 15,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      18,
+      86
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1101.539969444275,
+    "endpointName" : "TP-7",
+    "id" : "C50F992A-41A0-4FCE-948B-13C36AA6C885",
+    "index" : 14,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      109,
+      83
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1096.0829257965088,
+    "endpointName" : "TP-7",
+    "id" : "CE8F907C-36F1-42BF-BFFA-A07403D3A0B7",
+    "index" : 13,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      87,
+      81
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1088.2089138031006,
+    "endpointName" : "TP-7",
+    "id" : "71A6E6D2-014F-4DE2-9E9F-990CB30437A1",
+    "index" : 12,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      82,
+      79
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1080.277919769287,
+    "endpointName" : "TP-7",
+    "id" : "4E56C098-C7E4-4C0A-A42D-48E161DD482F",
+    "index" : 11,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      93,
+      77
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1072.740912437439,
+    "endpointName" : "TP-7",
+    "id" : "F75CEC99-728C-43AB-8894-E99917995515",
+    "index" : 10,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      120,
+      75
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1065.208911895752,
+    "endpointName" : "TP-7",
+    "id" : "443A907E-7BF5-4BE8-9D54-772EE834E56D",
+    "index" : 9,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      35,
+      74
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1055.8990240097046,
+    "endpointName" : "TP-7",
+    "id" : "7531B5FD-C329-4912-A380-6F3DFC94FD7C",
+    "index" : 8,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      94,
+      72
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1055.872917175293,
+    "endpointName" : "TP-7",
+    "id" : "70858392-5C94-4649-A866-7F6D12D8AC0B",
+    "index" : 7,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      40,
+      71
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1039.6009683609009,
+    "endpointName" : "TP-7",
+    "id" : "9AD2C9D6-E933-4F98-998A-C381721EBCA9",
+    "index" : 6,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      3,
+      70
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1032.5700044631958,
+    "endpointName" : "TP-7",
+    "id" : "04B0F1D9-76F6-45BB-B9CC-462DE34ABC52",
+    "index" : 5,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      110,
+      68
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1021.3710069656372,
+    "endpointName" : "TP-7",
+    "id" : "CEDCC1B0-919C-47CF-A6FB-1ADA08BE1B75",
+    "index" : 4,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      105,
+      67
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1021.3669538497925,
+    "endpointName" : "TP-7",
+    "id" : "B2746EDC-D7CB-4B13-B53B-86F8FCFDC51D",
+    "index" : 3,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      116,
+      66
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 1021.3359594345093,
+    "endpointName" : "TP-7",
+    "id" : "FDB429BC-A319-45A3-86CA-2B0EA22FECEA",
+    "index" : 2,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      15,
+      66
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  },
+  {
+    "channel" : 1,
+    "deltaMilliseconds" : 988.5469675064087,
+    "endpointName" : "TP-7",
+    "id" : "1FEB3A88-3F42-4186-BE9B-EC6824CD5ECD",
+    "index" : 1,
+    "kind" : "raw",
+    "rawBytes" : [
+      224,
+      116,
+      64
+    ],
+    "timestamp" : "2026-06-23T09:36:45Z"
+  }
+]

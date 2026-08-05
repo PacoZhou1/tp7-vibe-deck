@@ -1,8 +1,9 @@
+.build/
+.swiftpm/
+dist/
 build/
+*.dmg
+*.app
 .DS_Store
-*.swp
-.env
-.build
-.swiftpm/xcode/xcuserdata/
-__pycache__/
-*.pyc
+xcuserdata/
+DerivedData/

@@ -1,0 +1,24 @@
+TP-7 3D asset
+
+Current bundled asset:
+Teenage_Engineering_TP-7.usdz supplied by the user from
+the local TP-7 asset handoff.
+
+Previous fallback/provenance asset:
+Bundled asset:
+Teenage engineering tp 7 by Denis Nikolaichuk on BlenderKit / Blendkit
+https://www.blendkit.com/asset-gallery-detail/034033a1-1f83-46f4-ba49-f26cd83c6149/
+Asset base id: 034033a1-1f83-46f4-ba49-f26cd83c6149
+Downloaded file id: 539126, glTF/GLB
+License reported by BlenderKit API: royalty_free
+Author: Denis Nikolaichuk
+
+Conversion notes:
+The BlenderKit GLB uses Draco mesh compression and WebP textures. For native
+macOS rendering, it was decoded with glTF Transform, exported through Assimp to
+Collada, converted with Apple's scntool to SceneKit .scn, and bundled with PNG
+textures. The original GLB is retained in the app resources for provenance.
+
+Fallback:
+If SceneKit cannot load the bundled .scn on a target machine, the app falls back
+to a native SceneKit TP-7 reconstruction so input mapping remains usable.
