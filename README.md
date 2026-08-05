@@ -1,61 +1,142 @@
 # Open Speech ASR
 
-Open Speech ASR is a macOS native dictation app forked from the previous OpenSpeech/FreeFlow codebase.
+Open Speech ASR is a native macOS voice-input app for turning speech into clean text anywhere you can type. It is an open-source continuation of the OpenSpeech/FreeFlow line, rebuilt around a local-first Apple Silicon pipeline.
 
-The default mode replaces the Python SenseVoice ASR path with Swift-native Qwen3-ASR while keeping local Gemma E4B for prompt-based correction:
+The core promise is simple: speak, get polished text, keep your data on your Mac.
 
-- ASR runs in the Swift process through `speech-swift` `Qwen3ASR`.
-- Text cleanup runs through the bundled local Gemma E4B backend, so prompt presets and custom vocabulary apply after recognition.
-- The bundled model is `aufklarer/Qwen3-ASR-1.7B-MLX-4bit`.
-- The packaged app includes the local model under `Contents/Resources/qwen3-asr-1.7b-4bit`.
-- In the default mode, Python starts only for Gemma correction and skips loading SenseVoice ASR.
-- `第三方 API` mode does not start the Python backend.
+![Open Speech ASR app icon](website/assets/open-speech-app-icon.png)
 
-## Engine Modes
+## Product Preview
 
-- `Qwen3-ASR + Gemma E4B`: default first-run mode. Loads the bundled Qwen3-ASR model in Swift, then uses local Gemma E4B for prompt presets, correction, output language, and custom vocabulary.
-- `SenseVoice + Gemma E4B`: starts the bundled Python backend, exposes `/asr` and `/polish`, and waits for both `asrLoaded` and `modelLoaded`.
-- `第三方 API`: uses the OpenAI-compatible API settings for audio transcription and LLM post-processing. Local Python/Gemma stays off.
+Open Speech can be mapped into a hardware or automation workflow through configurable shortcuts and presets:
 
-## Build
+![Open Speech shortcut mapping](website/assets/github-shortcut-mapping.png)
 
-```bash
-make all
-```
+The repository also includes the companion TP-7 Vibe Deck workflow. These screenshots show the optional controller console, not the core Open Speech speech engine:
 
-The build uses SwiftPM, then precompiles MLX Metal shaders into `mlx.metallib` and copies it next to the app executable. Do not skip this step: without the precompiled Metal library, MLX can fall back to runtime shader compilation and Qwen3-ASR inference becomes much slower.
+![TP-7 Vibe Deck overview](website/assets/github-tp7-vibe-deck-overview.png)
 
-The default model source is:
+![TP-7 Vibe Deck mapping](website/assets/github-tp7-vibe-deck-mapping.png)
+
+## Why It Is Different
+
+- **macOS-native experience**: Swift, SwiftUI, AppKit, AVAudioEngine, global shortcuts, menu-bar controls, Keychain storage, and native accessibility integration.
+- **Local by default**: the default ASR and correction path runs on the Mac. Audio and transcripts do not need to leave the device.
+- **Native ASR inference**: Qwen3-ASR runs inside the Swift process through MLX Swift and `speech-swift`, with a precompiled Metal shader library for fast Apple GPU inference.
+- **Local text correction**: bundled Gemma E4B applies prompt presets, punctuation, vocabulary, and output-language rules locally through the optional bundled MLX backend.
+- **Replaceable engines**: users can choose `Qwen3-ASR + Gemma E4B`, `SenseVoice + Gemma E4B`, or a configured third-party API.
+- **Designed for repeated dictation**: model lifecycle control, cache cleanup, combined memory budgeting, stale-process protection, and a first-run setup flow are built into the app.
+
+Local-first does not mean provider-blind. When `第三方 API` mode is selected, audio or text is sent to the endpoint configured by the user. That mode is explicit and separate from the local modes.
+
+## Features
+
+- System-wide dictation into the active text field.
+- Chinese and English transcription with Qwen3-ASR 1.7B 4-bit.
+- Local Gemma E4B correction with editable prompt presets.
+- Custom vocabulary and context-aware cleanup.
+- Output-language conversion when requested by the selected prompt.
+- Three engine modes with synchronized frontend and backend state.
+- Configurable global shortcuts and microphone selection.
+- First-run guidance for microphone, accessibility, shortcut, and transcription setup.
+- Memory cleanup at the combined local MLX budget and a guarded restart fallback at the hard limit.
+- Optional OpenAI-compatible third-party transcription and LLM endpoints.
+
+## Architecture
 
 ```text
-/Users/paco/Documents/LLM-Models/Qwen3-ASR-1.7B-4bit
+Microphone
+   |
+   v
+Swift / AVAudioEngine / Qwen3ASRProvider
+   |  Qwen3-ASR inference in-process via MLX Swift
+   v
+Raw transcript
+   |
+   +--> local Gemma E4B correction (optional, bundled backend)
+   |
+   +--> third-party API correction (explicit user-selected mode)
+   v
+Clean text pasted into the active macOS application
 ```
 
-Override it with:
+The default Qwen path does not load SenseVoice. The legacy `SenseVoice + Gemma E4B` option remains available for compatibility. The local correction backend listens on `127.0.0.1:8001` and is started only when a local Gemma mode needs it.
+
+## Technology Stack
+
+| Layer | Technology |
+| --- | --- |
+| App shell | Swift 5.10, SwiftUI, AppKit, Swift Package Manager |
+| Audio and input | AVAudioEngine, macOS Accessibility APIs, global shortcut handling |
+| Native ASR | `speech-swift` `Qwen3ASR`, MLX Swift, Qwen3-ASR 1.7B 4-bit |
+| GPU runtime | Apple Metal through MLX, precompiled `mlx.metallib` |
+| Local correction | Bundled Python 3.13 runtime, MLX-based Gemma E4B backend, Uvicorn/FastAPI endpoints |
+| Secure settings | macOS Keychain and UserDefaults for non-secret preferences |
+| Distribution | Developer ID signing, Apple notarization, stapled DMG |
+
+## Requirements
+
+- macOS 15 or newer.
+- Apple Silicon Mac recommended for local MLX inference.
+- Microphone and Accessibility permissions for full dictation behavior.
+- About 8GB or more of available memory for Qwen3-ASR plus local Gemma correction.
+
+The model weights are intentionally not committed to this repository. The release DMG contains the tested model bundle; source builds must provide model directories locally.
+
+## Build From Source
+
+Install Xcode Command Line Tools and Swift Package Manager dependencies, then provide the local Qwen model directory:
 
 ```bash
-make all QWEN3_ASR_MODEL_SOURCE=/path/to/Qwen3-ASR-1.7B-4bit
+make all \
+  QWEN3_ASR_MODEL_SOURCE=/path/to/Qwen3-ASR-1.7B-4bit \
+  BACKEND_RUNTIME_SOURCE=/path/to/compatible/backend-runtime
 ```
 
-## Package
+The Qwen directory must contain `model.safetensors`, `vocab.json`, and `merges.txt`. The backend runtime directory must contain the Python runtime and any local Gemma model resources expected by `backend/inference_server.py`.
+
+The build invokes `scripts/build_mlx_metallib.sh` and places the resulting `mlx.metallib` beside the app executable. Do not skip shader precompilation: without it, MLX can fall back to runtime shader compilation and inference can become several times slower.
+
+Run the native ASR smoke test against a real audio file:
 
 ```bash
-make dmg
+swift build -c release --disable-sandbox
+.build/release/asr-smoke-test path/to/audio.aiff /path/to/Qwen3-ASR-1.7B-4bit zh
 ```
 
-The DMG build resets local app state first for first-run QA, stages `Open Speech ASR.app`, includes an Applications alias, and signs the app. Set `CODESIGN_IDENTITY` and `NOTARIZE_PROFILE` for Developer ID distribution.
-
-## Validation
-
-The helper target below runs Qwen3-ASR against a real audio file using an explicit local model directory:
+Create a local package:
 
 ```bash
-swift build -c release --product asr-smoke-test --disable-sandbox
-.build/release/asr-smoke-test path/to/audio.aiff /Users/paco/Documents/LLM-Models/Qwen3-ASR-1.7B-4bit zh
+make dmg \
+  QWEN3_ASR_MODEL_SOURCE=/path/to/Qwen3-ASR-1.7B-4bit \
+  BACKEND_RUNTIME_SOURCE=/path/to/compatible/backend-runtime
 ```
 
-The same helper can point at the bundled app model:
+For distribution signing, set `CODESIGN_IDENTITY` to a Developer ID Application identity. The release workflow additionally uses `xcrun notarytool` and `stapler`.
+
+## Download
+
+Use the [latest GitHub Release](https://github.com/PacoZhou1/open-speech-asr/releases/latest) for the notarized macOS build and release notes.
+
+The full local model bundle is larger than GitHub's 2GiB per-release-asset limit, so the DMG is published as numbered parts with a SHA-256 file. Download every `Open-Speech-ASR.dmg.part-*` asset into one directory and join them in lexical order:
 
 ```bash
-.build/release/asr-smoke-test path/to/audio.aiff "build/Open Speech ASR.app/Contents/Resources/qwen3-asr-1.7b-4bit" en
+cat Open-Speech-ASR.dmg.part-* > "Open Speech ASR.dmg"
+shasum -a 256 -c Open-Speech-ASR.dmg.sha256
 ```
+
+## Privacy
+
+Local modes keep recognition and correction on the Mac. API mode is opt-in and uses the endpoint, model, and credentials configured by the user. API credentials are stored through the macOS Keychain rather than committed to the repository.
+
+This repository does not include model weights, personal settings, signing certificates, notarization credentials, or user audio.
+
+## Open Source
+
+The project is released under the MIT License. Contributions are welcome, especially around native macOS input behavior, MLX memory management, model-provider abstractions, accessibility, and packaging.
+
+Please read [LICENSE](LICENSE) before redistributing the application or its bundled model files. Model weights and third-party libraries remain subject to their own licenses and terms.
+
+## Known Limitation
+
+The current local correction backend uses `127.0.0.1:8001`. If another local service already owns that port, quit the conflicting service before starting a local Gemma mode. Dynamic backend-port allocation is a planned follow-up.

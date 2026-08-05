@@ -2,7 +2,7 @@
 
 ## Step 0 - Reconnaissance
 
-- Source copy: `/Users/paco/Documents/AI-Projects/Open Speech ASR`; original project was not modified.
+- Source copy: this repository's `Open Speech ASR` checkout; original project was not modified.
 - Existing ASR contract: `LocalBackendClient.transcribe(fileURL:) async throws -> String`; callers pass an audio file URL and receive a final text string. There is no current partial/streaming callback contract in the local ASR call path.
 - Python backend duties before migration: SenseVoice ASR plus local Gemma text correction, `/polish`, OpenAI-compatible chat completion, health, metrics, and memory cleanup. Conclusion: remove Python ASR responsibility, retain Python only for optional local Gemma correction.
 - `speech-swift` API difference from the initial plan: current upstream uses `Qwen3ASRModel.fromPretrained(modelId:cacheDir:offlineMode:progressHandler:)` and `transcribe(audio:sampleRate:language:)`. It does not expose the planned `loadFromHub()` or `transcribe(audioFile:)` API in the checked-out code.

@@ -3,945 +3,288 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Open Speech ASR - macOS 原生本地语音转写</title>
-    <meta name="description" content="Open Speech ASR 是一款 macOS 原生语音转写应用，内置 Qwen3-ASR 本地识别与 Gemma E4B 文本润色，支持快捷键唤起、提示词修正、自定义词表和第三方 API 模式。">
+    <title>Open Speech ASR - Mac 本地 AI 语音输入</title>
+    <meta name="description" content="Open Speech ASR 是面向 macOS 的本地优先语音输入工具：原生 Swift + MLX Local AI 架构，本地识别、本地纠错、八国语言、自定义提示词、完全隐私。">
     <meta name="robots" content="index,follow,max-image-preview:large">
     <meta name="author" content="Open Speech ASR">
     <meta name="application-name" content="Open Speech ASR">
     <meta name="apple-mobile-web-app-title" content="Open Speech ASR">
-    <meta name="theme-color" content="#f7fbff">
+    <meta name="theme-color" content="#f7f9f7">
     <meta name="color-scheme" content="light">
-    <meta name="keywords" content="Open Speech ASR, macOS语音转写, 本地ASR, Qwen3-ASR, Gemma E4B, Mac dictation, 语音输入">
-    <meta name="ai-summary" content="Open Speech ASR 是 macOS 原生语音转写工具，默认使用本地 Qwen3-ASR 识别和本地 Gemma E4B 润色，也支持 SenseVoice + Gemma 与第三方 API 模式。">
+    <meta name="keywords" content="Open Speech ASR, macOS语音输入, 本地ASR, Swift MLX, Local AI, Qwen3-ASR, Gemma E4B, 八国语言输入, 提示词改写">
+    <meta name="ai-summary" content="Open Speech ASR 是 macOS 本地优先语音输入应用，使用原生 Swift + MLX Local AI 架构，提供本地 ASR、本地 LLM 纠错、八国语言、提示词改写和隐私优先的系统级输入体验。">
     <link rel="canonical" href="https://openspeech.bumiaoai.com/">
-    <link rel="icon" href="assets/app-icon.png" type="image/png">
-    <link rel="apple-touch-icon" href="assets/app-icon.png">
-    <link rel="preload" href="assets/demo.gif" as="image">
+    <link rel="icon" href="assets/icon-open-speech-terminal-clean-20260618.png?v=20260618-clean" type="image/png">
+    <link rel="apple-touch-icon" href="assets/icon-open-speech-terminal-clean-20260618.png?v=20260618-clean">
+    <link rel="preload" href="assets/os-hero-local-ai-20260626.png" as="image">
+    <link rel="stylesheet" href="assets/site.css?v=20260627-mobile-nav">
+    <link rel="stylesheet" href="assets/openspeech.css?v=20260627-mobile">
     <link rel="alternate" type="text/plain" href="llms.txt" title="Open Speech ASR information for AI agents">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Open Speech ASR">
-    <meta property="og:title" content="Open Speech ASR - macOS 原生本地语音转写">
-    <meta property="og:description" content="内置 Qwen3-ASR 本地识别与 Gemma E4B 文本润色，支持快捷键唤起、提示词修正、自定义词表和第三方 API 模式。">
-    <meta property="og:image" content="https://openspeech.bumiaoai.com/assets/app-icon.png">
-    <meta property="og:image:alt" content="Open Speech ASR app icon">
+    <meta property="og:title" content="Open Speech ASR - Mac 本地 AI 语音输入">
+    <meta property="og:description" content="把声音留在 Mac 里，用本地 AI 识别、纠错、改写，再回到当前输入框。">
+    <meta property="og:image" content="https://openspeech.bumiaoai.com/assets/os-hero-local-ai-20260626.png">
+    <meta property="og:image:alt" content="Open Speech ASR local AI hero visual">
     <meta property="og:url" content="https://openspeech.bumiaoai.com/">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Open Speech ASR - macOS 原生本地语音转写">
-    <meta name="twitter:description" content="面向 macOS 的本地优先语音转写与文本润色工具。">
-    <meta name="twitter:image" content="https://openspeech.bumiaoai.com/assets/app-icon.png">
+    <meta name="twitter:title" content="Open Speech ASR - Mac 本地 AI 语音输入">
+    <meta name="twitter:description" content="原生 Swift + MLX，本地识别，本地纠错，八国语言，自定义提示词。">
+    <meta name="twitter:image" content="https://openspeech.bumiaoai.com/assets/os-hero-local-ai-20260626.png">
+    <script>document.documentElement.classList.add("motion-ready");</script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@graph": [
-          {
-            "@type": "WebSite",
-            "@id": "https://openspeech.bumiaoai.com/#website",
-            "name": "Open Speech ASR",
-            "url": "https://openspeech.bumiaoai.com/",
-            "description": "Open Speech ASR 中文发布站。",
-            "inLanguage": "zh-CN"
-          },
-          {
-            "@type": "SoftwareApplication",
-            "@id": "https://openspeech.bumiaoai.com/#software",
-            "name": "Open Speech ASR",
-            "url": "https://openspeech.bumiaoai.com/",
-            "description": "macOS 原生语音转写应用，内置 Qwen3-ASR 本地识别与 Gemma E4B 文本润色。",
-            "applicationCategory": "ProductivityApplication",
-            "operatingSystem": "macOS",
-            "softwareRequirements": "macOS on Apple Silicon",
-            "downloadUrl": "https://openspeech.bumiaoai.com/downloads/OpenSpeechASR-full-features-original-2026-06-18.dmg",
-            "installUrl": "https://openspeech.bumiaoai.com/downloads/OpenSpeechASR-full-features-original-2026-06-18.dmg",
-            "image": "https://openspeech.bumiaoai.com/assets/app-icon.png",
-            "offers": {
-              "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "CNY"
-            },
-            "featureList": [
-              "Qwen3-ASR 本地语音识别",
-              "Gemma E4B 本地文本润色",
-              "快捷键唤起语音输入",
-              "提示词预设与自定义词表",
-              "第三方 API 模式"
-            ]
-          },
-          {
-            "@type": "FAQPage",
-            "@id": "https://openspeech.bumiaoai.com/#faq",
-            "mainEntity": [
-              {
-                "@type": "Question",
-                "name": "Open Speech ASR 会收集我的数据吗？",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "默认本地模式不依赖 Open Speech 服务器。第三方 API 模式仅会把必要的音频或文本发送到用户自己配置的服务商。"
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "安装包为什么比较大？",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "安装包内置本地 ASR 模型和本地文本润色后端，用于减少首次配置成本并支持离线优先的识别体验。"
-                }
-              }
-            ]
-          }
-        ]
+        "@type": "SoftwareApplication",
+        "name": "Open Speech ASR",
+        "applicationCategory": "ProductivityApplication",
+        "operatingSystem": "macOS",
+        "softwareRequirements": "macOS on Apple Silicon; 16GB+ memory recommended for the best local AI experience",
+        "url": "https://openspeech.bumiaoai.com/",
+        "downloadUrl": "https://github.com/PacoZhou1/open-speech-asr/releases/latest",
+        "image": "https://openspeech.bumiaoai.com/assets/icon-open-speech-terminal-clean-20260618.png",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
       }
     </script>
-    <style>
-      :root {
-        --bg: #f7fbff;
-        --surface: #ffffff;
-        --surface-soft: #eef7f8;
-        --ink: #101828;
-        --muted: #5b677a;
-        --line: #d9e4ea;
-        --blue: #1f6feb;
-        --blue-dark: #184fba;
-        --green: #0f8f75;
-        --green-soft: #dff8f2;
-        --shadow: 0 22px 60px rgba(33, 76, 111, 0.14);
-        --radius: 8px;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      html {
-        scroll-behavior: smooth;
-      }
-
-      body {
-        margin: 0;
-        color: var(--ink);
-        background: var(--bg);
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
-        letter-spacing: 0;
-      }
-
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-
-      img {
-        display: block;
-        max-width: 100%;
-      }
-
-      .container {
-        width: min(1120px, calc(100% - 48px));
-        margin: 0 auto;
-      }
-
-      .site-header {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-        background: rgba(247, 251, 255, 0.86);
-        border-bottom: 1px solid rgba(217, 228, 234, 0.8);
-        backdrop-filter: blur(18px);
-      }
-
-      .nav {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        min-height: 72px;
-        gap: 24px;
-      }
-
-      .brand {
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 19px;
-        font-weight: 760;
-      }
-
-      .brand img {
-        width: 38px;
-        height: 38px;
-        border-radius: 8px;
-      }
-
-      .nav-links {
-        display: flex;
-        align-items: center;
-        gap: 28px;
-        color: var(--muted);
-        font-size: 14px;
-        font-weight: 560;
-      }
-
-      .nav-links a:hover {
-        color: var(--ink);
-      }
-
-      .button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 9px;
-        min-height: 44px;
-        padding: 0 18px;
-        border: 1px solid transparent;
-        border-radius: var(--radius);
-        font-size: 15px;
-        font-weight: 680;
-        line-height: 1;
-        transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
-      }
-
-      .button:hover {
-        transform: translateY(-1px);
-      }
-
-      .button.primary {
-        color: #fff;
-        background: var(--blue);
-        box-shadow: 0 14px 30px rgba(31, 111, 235, 0.24);
-      }
-
-      .button.primary:hover {
-        background: var(--blue-dark);
-      }
-
-      .button.secondary {
-        color: var(--ink);
-        background: #fff;
-        border-color: var(--line);
-      }
-
-      .icon {
-        width: 18px;
-        height: 18px;
-        flex: 0 0 auto;
-      }
-
-      .hero {
-        padding: 74px 0 56px;
-        overflow: hidden;
-      }
-
-      .hero-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1.02fr) minmax(360px, 0.98fr);
-        align-items: center;
-        gap: 56px;
-      }
-
-      h1 {
-        margin: 0;
-        max-width: 720px;
-        font-size: 68px;
-        line-height: 0.98;
-        font-weight: 820;
-        letter-spacing: 0;
-      }
-
-      .hero-copy {
-        margin: 24px 0 0;
-        max-width: 660px;
-        color: var(--muted);
-        font-size: 20px;
-        line-height: 1.72;
-      }
-
-      .hero-actions {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 14px;
-        margin-top: 34px;
-      }
-
-      .release-meta {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 1px;
-        margin-top: 34px;
-        overflow: hidden;
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: var(--line);
-      }
-
-      .meta-item {
-        min-width: 0;
-        padding: 15px 16px;
-        background: rgba(255, 255, 255, 0.78);
-      }
-
-      .meta-label {
-        color: var(--muted);
-        font-size: 12px;
-        line-height: 1.3;
-      }
-
-      .meta-value {
-        margin-top: 6px;
-        overflow: hidden;
-        color: var(--ink);
-        font-size: 14px;
-        font-weight: 720;
-        line-height: 1.35;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      .product-panel {
-        position: relative;
-        border: 1px solid rgba(217, 228, 234, 0.9);
-        border-radius: var(--radius);
-        background: linear-gradient(180deg, #ffffff 0%, #f2f8fb 100%);
-        box-shadow: var(--shadow);
-        overflow: hidden;
-      }
-
-      .panel-bar {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        height: 42px;
-        padding: 0 16px;
-        border-bottom: 1px solid var(--line);
-      }
-
-      .dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-      }
-
-      .dot.red {
-        background: #ff6b5f;
-      }
-
-      .dot.yellow {
-        background: #f4bd50;
-      }
-
-      .dot.green {
-        background: #57c76a;
-      }
-
-      .panel-body {
-        padding: 24px;
-      }
-
-      .app-card {
-        display: grid;
-        grid-template-columns: 70px 1fr;
-        gap: 18px;
-        align-items: center;
-        padding-bottom: 22px;
-        border-bottom: 1px solid var(--line);
-      }
-
-      .app-card img {
-        width: 70px;
-        height: 70px;
-        border-radius: 8px;
-        box-shadow: 0 16px 34px rgba(72, 113, 150, 0.18);
-      }
-
-      .app-title {
-        margin: 0;
-        font-size: 23px;
-        font-weight: 800;
-      }
-
-      .app-subtitle {
-        margin: 7px 0 0;
-        color: var(--muted);
-        font-size: 14px;
-        line-height: 1.55;
-      }
-
-      .waveform {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        height: 104px;
-        margin: 22px 0;
-        border-radius: var(--radius);
-        background: #eaf6fb;
-      }
-
-      .waveform span {
-        width: 8px;
-        border-radius: 6px;
-        background: linear-gradient(180deg, var(--blue), var(--green));
-        animation: pulse 1.4s ease-in-out infinite;
-      }
-
-      .waveform span:nth-child(1) { height: 34px; animation-delay: 0ms; }
-      .waveform span:nth-child(2) { height: 58px; animation-delay: 80ms; }
-      .waveform span:nth-child(3) { height: 78px; animation-delay: 160ms; }
-      .waveform span:nth-child(4) { height: 50px; animation-delay: 240ms; }
-      .waveform span:nth-child(5) { height: 88px; animation-delay: 320ms; }
-      .waveform span:nth-child(6) { height: 42px; animation-delay: 400ms; }
-      .waveform span:nth-child(7) { height: 66px; animation-delay: 480ms; }
-
-      @keyframes pulse {
-        0%, 100% { transform: scaleY(0.72); opacity: 0.7; }
-        50% { transform: scaleY(1); opacity: 1; }
-      }
-
-      .transcript {
-        padding: 18px;
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: #fff;
-      }
-
-      .transcript p {
-        margin: 0;
-        color: #263345;
-        font-size: 15px;
-        line-height: 1.72;
-      }
-
-      .status-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        margin-top: 14px;
-      }
-
-      .status {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        min-height: 42px;
-        padding: 0 13px;
-        border-radius: var(--radius);
-        color: #0e6958;
-        background: var(--green-soft);
-        font-size: 13px;
-        font-weight: 680;
-      }
-
-      .status::before {
-        content: "";
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--green);
-      }
-
-      section {
-        padding: 68px 0;
-      }
-
-      .section-head {
-        max-width: 760px;
-        margin-bottom: 34px;
-      }
-
-      h2 {
-        margin: 0;
-        font-size: 38px;
-        line-height: 1.15;
-        font-weight: 800;
-        letter-spacing: 0;
-      }
-
-      .section-copy {
-        margin: 14px 0 0;
-        color: var(--muted);
-        font-size: 17px;
-        line-height: 1.7;
-      }
-
-      .feature-list {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 18px;
-      }
-
-      .feature {
-        display: grid;
-        grid-template-columns: 42px 1fr;
-        gap: 15px;
-        padding: 22px;
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: var(--surface);
-      }
-
-      .feature-icon {
-        display: grid;
-        place-items: center;
-        width: 42px;
-        height: 42px;
-        border-radius: var(--radius);
-        color: var(--blue);
-        background: #e8f1ff;
-      }
-
-      .feature h3 {
-        margin: 0;
-        font-size: 18px;
-        line-height: 1.35;
-      }
-
-      .feature p {
-        margin: 7px 0 0;
-        color: var(--muted);
-        font-size: 15px;
-        line-height: 1.65;
-      }
-
-      .split {
-        display: grid;
-        grid-template-columns: 0.92fr 1.08fr;
-        align-items: start;
-        gap: 42px;
-      }
-
-      .plain-panel {
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: var(--surface);
-        overflow: hidden;
-      }
-
-      .rows {
-        display: grid;
-      }
-
-      .row {
-        display: grid;
-        grid-template-columns: 180px 1fr;
-        gap: 16px;
-        padding: 18px 22px;
-        border-top: 1px solid var(--line);
-      }
-
-      .row:first-child {
-        border-top: 0;
-      }
-
-      .row strong {
-        font-size: 15px;
-      }
-
-      .row span,
-      .row code {
-        color: var(--muted);
-        font-size: 15px;
-        line-height: 1.6;
-      }
-
-      code {
-        overflow-wrap: anywhere;
-        font-family: "SF Mono", "Menlo", "Consolas", monospace;
-      }
-
-      .steps {
-        display: grid;
-        gap: 12px;
-      }
-
-      .step {
-        display: grid;
-        grid-template-columns: 36px 1fr;
-        gap: 14px;
-        align-items: start;
-        padding: 18px;
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: #fff;
-      }
-
-      .step-number {
-        display: grid;
-        place-items: center;
-        width: 36px;
-        height: 36px;
-        border-radius: var(--radius);
-        color: #fff;
-        background: var(--green);
-        font-weight: 800;
-      }
-
-      .step h3 {
-        margin: 0;
-        font-size: 17px;
-      }
-
-      .step p {
-        margin: 6px 0 0;
-        color: var(--muted);
-        font-size: 15px;
-        line-height: 1.65;
-      }
-
-      .download-band {
-        padding: 50px 0 78px;
-      }
-
-      .download-box {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 32px;
-        align-items: center;
-        padding: 30px;
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: linear-gradient(135deg, #ffffff 0%, #eef8fb 100%);
-        box-shadow: var(--shadow);
-      }
-
-      .checksum {
-        margin-top: 16px;
-        padding: 14px;
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        background: rgba(255, 255, 255, 0.72);
-      }
-
-      .checksum span {
-        display: block;
-        margin-bottom: 6px;
-        color: var(--muted);
-        font-size: 12px;
-      }
-
-      .checksum code {
-        display: block;
-        color: #1c2c3f;
-        font-size: 13px;
-        line-height: 1.55;
-      }
-
-      .site-footer {
-        padding: 28px 0;
-        border-top: 1px solid var(--line);
-        color: var(--muted);
-        background: #fff;
-        font-size: 14px;
-      }
-
-      .footer-row {
-        display: flex;
-        justify-content: space-between;
-        gap: 20px;
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        html {
-          scroll-behavior: auto;
-        }
-
-        *,
-        *::before,
-        *::after {
-          animation-duration: 1ms !important;
-          scroll-behavior: auto !important;
-          transition-duration: 1ms !important;
-        }
-      }
-
-      @media (max-width: 900px) {
-        .hero-grid,
-        .split,
-        .download-box {
-          grid-template-columns: 1fr;
-        }
-
-        h1 {
-          font-size: 52px;
-        }
-
-        .product-panel {
-          max-width: 560px;
-        }
-
-        .release-meta {
-          grid-template-columns: 1fr;
-        }
-
-        .feature-list {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      @media (max-width: 680px) {
-        .container {
-          width: min(100% - 32px, 1120px);
-        }
-
-        .nav {
-          align-items: flex-start;
-          flex-direction: column;
-          padding: 16px 0;
-        }
-
-        .nav-links {
-          width: 100%;
-          justify-content: space-between;
-          gap: 12px;
-          overflow-x: auto;
-          padding-bottom: 2px;
-        }
-
-        .hero {
-          padding-top: 44px;
-        }
-
-        h1 {
-          font-size: 42px;
-          line-height: 1.04;
-        }
-
-        h2 {
-          font-size: 30px;
-        }
-
-        .hero-copy,
-        .section-copy {
-          font-size: 16px;
-        }
-
-        .hero-actions {
-          align-items: stretch;
-          flex-direction: column;
-        }
-
-        .button {
-          width: 100%;
-        }
-
-        .status-row {
-          grid-template-columns: 1fr;
-        }
-
-        .row {
-          grid-template-columns: 1fr;
-          gap: 8px;
-        }
-
-        .footer-row {
-          flex-direction: column;
-        }
-      }
-    </style>
   </head>
-  <body>
+  <body class="openspeech-page">
     <header class="site-header">
       <div class="container nav">
-        <a class="brand" href="/" aria-label="Open Speech ASR 首页">
-          <img src="assets/app-icon.png" alt="Open Speech ASR 图标">
-          <span>Open Speech ASR</span>
+        <a class="brand" href="index.html" aria-label="Paco Works 首页">
+          <img src="assets/icon-open-speech-terminal-nav-20260618.png?v=20260618-nav" alt="Open Speech ASR 图标">
+          <span>Paco Works</span>
         </a>
-        <nav class="nav-links" aria-label="主导航">
-          <a href="#features">功能</a>
-          <a href="#privacy">隐私</a>
-          <a href="#install">安装</a>
-          <a href="#download">下载</a>
+        <nav class="nav-links" aria-label="页面导航">
+          <a class="current" href="index.html">Open Speech ASR</a>
+          <a href="tp7-vibe-input.html">TP-7 Vibe Input</a>
         </nav>
       </div>
     </header>
 
-    <main>
-      <section class="hero">
-        <div class="container hero-grid">
+    <main id="top">
+      <section class="os-hero section-anchor" id="overview">
+        <div class="container os-hero-grid">
+          <div class="os-hero-copy reveal">
+            <p class="os-project-label">Paco Works / Local AI voice input</p>
+            <h1>Mac 本地 AI，<br>直接写好。</h1>
+            <p class="os-hero-lede">Open Speech ASR 是一个原生 macOS 语音输入项目：Swift + MLX 跑在本机，完成本地识别、本地纠错和本地改写，然后把结果回填到你正在输入的地方。</p>
+            <div class="os-hero-actions">
+              <a class="button primary" href="https://github.com/PacoZhou1/open-speech-asr/releases/latest">前往 GitHub 下载</a>
+              <a class="button secondary" href="#workflow">看工作流</a>
+            </div>
+            <div class="os-proof-row" aria-label="Open Speech ASR 核心卖点">
+              <span>Local AI</span>
+              <span>Swift + MLX</span>
+              <span>完全隐私</span>
+              <span>八国语言</span>
+            </div>
+          </div>
+
+          <div class="os-hero-visual reveal">
+            <img src="assets/os-hero-local-ai-20260626.png" alt="Open Speech ASR 本地 AI 语音输入视觉">
+            <div class="os-demo-card" aria-label="语音输入工作流示例">
+              <div class="os-demo-head">
+                <span></span><span></span><span></span>
+                <strong>Open Speech</strong>
+              </div>
+              <div class="os-wave" aria-hidden="true">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              </div>
+              <div class="os-demo-result">
+                <small>说话原文</small>
+                <p>嗯，那个，明天下午四点，哦不对，三点吧，和设计那边，嗯，去对一下首页，重点看那个首屏的文案，截图质量，还有那个，对，下载按钮是不是够明显能看出来的。</p>
+              </div>
+              <div class="os-demo-result polished">
+                <small>Open Speech 输出</small>
+                <p>明天下午 3 点和设计团队 review 首页：确认首屏文案、截图质量，以及下载按钮的可见性。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="os-case-strip">
+        <div class="container os-case-grid reveal">
           <div>
-            <h1>Open Speech ASR</h1>
-            <p class="hero-copy">面向 macOS 的原生语音转写工具。默认使用本地 Qwen3-ASR 完成识别，再用本地 Gemma E4B 做提示词润色、词表修正和语言整理，让长句输入更自然，也让隐私边界更清楚。</p>
-            <div class="hero-actions">
-              <a class="button primary" href="downloads/OpenSpeechASR-full-features-original-2026-06-18.dmg" download>
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                下载 macOS 版
-              </a>
-              <a class="button secondary" href="#checksum">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 12.5 11.2 15 15.5 9M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                查看校验值
-              </a>
-            </div>
-            <div class="release-meta" aria-label="版本信息">
-              <div class="meta-item">
-                <div class="meta-label">版本</div>
-                <div class="meta-value">Full Features Original</div>
-              </div>
-              <div class="meta-item">
-                <div class="meta-label">发布时间</div>
-                <div class="meta-value">2026-06-18</div>
-              </div>
-              <div class="meta-item">
-                <div class="meta-label">安装包大小</div>
-                <div class="meta-value">约 6.4 GB</div>
-              </div>
-            </div>
+            <span>Project</span>
+            <strong>Open Speech ASR</strong>
           </div>
-
-          <div class="product-panel" aria-label="Open Speech ASR 应用预览">
-            <div class="panel-bar">
-              <span class="dot red"></span>
-              <span class="dot yellow"></span>
-              <span class="dot green"></span>
-            </div>
-            <div class="panel-body">
-              <div class="app-card">
-                <img src="assets/app-icon.png" alt="">
-                <div>
-                  <p class="app-title">正在聆听</p>
-                  <p class="app-subtitle">按下快捷键，说完后自动转写并粘贴到当前输入位置。</p>
-                </div>
-              </div>
-              <div class="waveform" aria-hidden="true">
-                <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-              </div>
-              <div class="transcript">
-                <p>把刚才的会议纪要整理成三点：问题、决定和下一步行动。语气自然一点，保留产品名和人名。</p>
-              </div>
-              <div class="status-row">
-                <div class="status">Qwen3-ASR 本地识别</div>
-                <div class="status">Gemma E4B 本地润色</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="features">
-        <div class="container">
-          <div class="section-head">
-            <h2>为日常写作、会议记录和长文本输入准备</h2>
-            <p class="section-copy">Open Speech ASR 保留完整功能版本，不为商店审核裁剪快捷键和本地模型能力。下载安装后，你可以用系统级快捷键在任意文本框里完成语音输入。</p>
-          </div>
-          <div class="feature-list">
-            <article class="feature">
-              <div class="feature-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M7 8v8M17 8v8M4 11v2M20 11v2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
-              <div>
-                <h3>本地 Qwen3-ASR</h3>
-                <p>默认识别引擎在 Swift 进程内运行，安装包已包含 Qwen3-ASR 1.7B 4bit 模型，减少额外配置。</p>
-              </div>
-            </article>
-            <article class="feature">
-              <div class="feature-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 12h10M4 19h7M18 14l2 2-4 4h-2v-2l4-4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-              <div>
-                <h3>Gemma 文本润色</h3>
-                <p>识别结果可继续通过本地 Gemma E4B 做格式整理、语气修正、术语保留和自定义提示词处理。</p>
-              </div>
-            </article>
-            <article class="feature">
-              <div class="feature-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10M7 12h4m-7 8V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H8l-4 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-              <div>
-                <h3>快捷键语音输入</h3>
-                <p>支持按住说话、切换录音等工作流，把转写结果直接送回当前应用，适合写邮件、笔记和聊天。</p>
-              </div>
-            </article>
-            <article class="feature">
-              <div class="feature-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v4m0 10v4M5.6 5.6l2.8 2.8m7.2 7.2 2.8 2.8M3 12h4m10 0h4M5.6 18.4l2.8-2.8m7.2-7.2 2.8-2.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
-              <div>
-                <h3>多引擎可选</h3>
-                <p>保留 SenseVoice + Gemma、本地 Qwen3-ASR + Gemma，以及 OpenAI 兼容第三方 API 模式。</p>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section id="privacy">
-        <div class="container split">
-          <div class="section-head">
-            <h2>隐私边界清楚，默认本地优先</h2>
-            <p class="section-copy">应用本身不依赖 Open Speech 服务器。默认模式下，语音识别和文本润色都在本机完成；当你主动切换到第三方 API 模式时，才会向你配置的服务商发送必要内容。</p>
-          </div>
-          <div class="plain-panel rows">
-            <div class="row">
-              <strong>默认识别</strong>
-              <span>Qwen3-ASR 本地模型，运行在 macOS 应用进程内。</span>
-            </div>
-            <div class="row">
-              <strong>默认润色</strong>
-              <span>本地 Gemma E4B 后端，处理提示词、词表和输出语言。</span>
-            </div>
-            <div class="row">
-              <strong>第三方 API</strong>
-              <span>仅在你开启并填写 API 配置后使用，本地 Python/Gemma 会保持关闭。</span>
-            </div>
-            <div class="row">
-              <strong>权限说明</strong>
-              <span>首次使用需要授予麦克风、辅助功能或输入监控等 macOS 权限，用于录音、快捷键和粘贴结果。</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="install">
-        <div class="container split">
           <div>
-            <div class="section-head">
-              <h2>安装与系统要求</h2>
-              <p class="section-copy">下载 DMG 后拖入 Applications。首次启动时，按系统提示授予需要的权限；如果 macOS 提示来自互联网，请在系统设置中允许打开。</p>
-            </div>
-            <div class="plain-panel rows">
-              <div class="row">
-                <strong>系统</strong>
-                <span>macOS，建议 Apple Silicon 机型。</span>
-              </div>
-              <div class="row">
-                <strong>空间</strong>
-                <span>安装包约 6.4 GB，应用包含本地模型，请预留更充足磁盘空间。</span>
-              </div>
-              <div class="row">
-                <strong>权限</strong>
-                <span>麦克风、辅助功能、输入监控视具体快捷键和粘贴流程而定。</span>
-              </div>
-            </div>
+            <span>Architecture</span>
+            <strong>Native Swift + MLX AI</strong>
           </div>
-          <div class="steps">
-            <article class="step">
-              <div class="step-number">1</div>
-              <div>
-                <h3>下载 DMG</h3>
-                <p>使用页面下方按钮下载安装包，下载完成后可用 SHA256 校验完整性。</p>
-              </div>
-            </article>
-            <article class="step">
-              <div class="step-number">2</div>
-              <div>
-                <h3>拖入 Applications</h3>
-                <p>打开 DMG，将 Open Speech ASR 拖入应用程序文件夹。</p>
-              </div>
-            </article>
-            <article class="step">
-              <div class="step-number">3</div>
-              <div>
-                <h3>授权并开始说话</h3>
-                <p>启动应用后授予权限，设置快捷键，然后在任意文本框里触发语音输入。</p>
-              </div>
-            </article>
+          <div>
+            <span>Default mode</span>
+            <strong>On-device, private</strong>
+          </div>
+          <div>
+            <span>Best fit</span>
+            <strong>16GB+ Pro chip Macs</strong>
           </div>
         </div>
       </section>
 
-      <section id="download" class="download-band">
-        <div class="container">
-          <div class="download-box">
-            <div>
-              <h2>下载完整功能版本</h2>
-              <p class="section-copy">这是保留本地模型、系统快捷键和第三方 API 模式的原始完整版本，适合通过官网直接分发。</p>
-              <div id="checksum" class="checksum">
-                <span>SHA256</span>
-                <code>508d41a0d9df510e5bf1164e158624717ddb61830cc9a5a285050db79ad562d8</code>
-              </div>
-            </div>
-            <a class="button primary" href="downloads/OpenSpeechASR-full-features-original-2026-06-18.dmg" download>
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              下载 DMG
-            </a>
+      <section class="os-section os-workflow section-anchor" id="workflow">
+        <div class="container os-split">
+          <div class="os-section-copy reveal">
+            <p class="os-section-label">Workflow</p>
+            <h2>按住说话，松手回填。</h2>
+            <p>它不是一个需要切换过去的转写窗口，而是系统级输入层。你在邮件、聊天、备忘录、文档里写到一半，直接按住快捷键说话，Open Speech 负责识别、纠错、改写和回填。</p>
           </div>
+          <div class="os-flow-board os-real-flow reveal" aria-label="Open Speech 工作流">
+            <figure class="os-real-shot compact">
+              <img src="assets/os-guide-entry-real-20260626.png" alt="Open Speech ASR 新手指引入口截图">
+            </figure>
+            <figure class="os-real-shot compact">
+              <img src="assets/os-shortcut-setup-real-20260626.png" alt="Open Speech ASR 快捷键设置截图">
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="os-section os-local section-anchor" id="privacy">
+        <div class="container os-feature-grid">
+          <figure class="os-image-frame reveal">
+            <img src="assets/os-privacy-local-boundary-20260626.png" alt="声音数据留在本机边界内的隐私视觉">
+          </figure>
+          <div class="os-section-copy reveal">
+            <p class="os-section-label">Privacy</p>
+            <h2>默认不出 Mac。</h2>
+            <p>核心体验不依赖 Open Speech 服务器。你的声音、草稿和提示词默认只在本机链路里流动；只有当你主动配置第三方 API 模式时，才会把必要内容交给你选择的服务商。</p>
+            <div class="os-mini-list">
+              <span>本地音频处理</span>
+              <span>本地文本纠错</span>
+              <span>无默认云端账号</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="os-section os-stack section-anchor" id="stack">
+        <div class="container os-feature-grid reverse">
+          <figure class="os-image-frame os-real-shot reveal">
+            <img src="assets/os-settings-model-real-20260626.png" alt="Open Speech ASR Qwen3-ASR 与 Gemma E4B 模型设置截图">
+          </figure>
+          <div class="os-section-copy os-readable-copy reveal">
+            <p class="os-section-label">Native model stack</p>
+            <h2>Qwen3-ASR MLX + Gemma E4B MLX。</h2>
+            <p>Open Speech 的识别和润色链路由 Qwen3-ASR MLX 与 Gemma E4B MLX 共同构成：前者负责把声音转成文本，后者读取提示词和常用词库，做纠错、清理语气词和风格改写，共同构筑快速、优雅的转写体验。</p>
+            <div class="os-stack-list">
+              <div><strong>Qwen3-ASR MLX</strong><span>本地语音识别，面向 Apple Silicon 加速</span></div>
+              <div><strong>Gemma E4B MLX</strong><span>本地纠错、提示词预设、常用词库</span></div>
+              <div><strong>Swift app</strong><span>权限、快捷键、录音、回填全部打包</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="os-section os-install section-anchor" id="install">
+        <div class="container os-feature-grid">
+          <figure class="os-image-frame os-real-shot reveal">
+            <img src="assets/os-install-dmg-real-20260626.png" alt="Open Speech ASR DMG 安装包截图">
+          </figure>
+          <div class="os-section-copy reveal">
+            <p class="os-section-label">Ready to use</p>
+            <h2>打开 DMG，拖进 Applications，就能开始。</h2>
+            <p>不需要用户配置 Python、模型目录或本地运行环境。Open Speech 把 app、模型和所需运行链路一起打包好，安装后按新手引导授予权限、设置快捷键，就能进入完整的本地 AI 语音输入体验。</p>
+            <div class="os-mini-list">
+              <span>无需命令行配置</span>
+              <span>模型随安装包提供</span>
+              <span>新手引导一步步完成</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="os-section os-speed section-anchor" id="speed">
+        <div class="container os-feature-grid">
+          <figure class="os-image-frame reveal">
+            <img src="assets/os-speed-instant-writing-20260626.png" alt="语音快速转成文本的速度视觉">
+          </figure>
+          <div class="os-section-copy reveal">
+            <p class="os-section-label">Speed and accuracy</p>
+            <h2>秒出答案，写得更准。</h2>
+            <p>macOS 自带听写适合简单输入；Open Speech 面向长句、专名、上下文修正和风格改写，目标是在这些场景里比系统听写更快、更准。机器越强，越能发挥本地模型的低延迟体验，建议 16GB 内存以上的 Pro 芯片 Mac。</p>
+            <div class="os-metric-row">
+              <div><strong>秒级</strong><span>录完即处理</span></div>
+              <div><strong>更准</strong><span>长文本与专名</span></div>
+              <div><strong>更顺</strong><span>直接回填</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="os-section os-languages section-anchor" id="languages">
+        <div class="container os-feature-grid reverse">
+          <figure class="os-image-frame reveal">
+            <img src="assets/os-eight-languages-20260626.png" alt="八国语言输入抽象视觉">
+          </figure>
+          <div class="os-section-copy reveal">
+            <p class="os-section-label">Languages</p>
+            <h2>八国语言，一套链路。</h2>
+            <p>中文、英文、日语、韩语、法语、德语、西班牙语、葡萄牙语都能进入同一个工作流。你可以说一种语言，输出另一种语言，也可以让提示词决定最终语气。</p>
+            <div class="os-language-grid" aria-label="支持语言">
+              <span>中文</span><span>English</span><span>日本語</span><span>한국어</span>
+              <span>Français</span><span>Deutsch</span><span>Español</span><span>Português</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="os-section os-prompts section-anchor" id="prompts">
+        <div class="container os-feature-grid">
+          <figure class="os-image-frame os-real-shot reveal">
+            <img src="assets/os-prompt-settings-real-20260626.png" alt="Open Speech ASR 提示词预设设置截图">
+          </figure>
+          <div class="os-section-copy reveal">
+            <p class="os-section-label">Prompt modes</p>
+            <h2>同一句话，换六种写法。</h2>
+            <p>同一句话可以被整理成会议纪要、翻译成英文、变成更高情商的回复，甚至转成文言文。你不需要录完再打开另一个 AI 工具改写，Open Speech 可以在输入链路里完成。</p>
+            <div class="os-prompt-modes">
+              <span>高情商发言</span>
+              <span>转译语言</span>
+              <span>转文言文</span>
+              <span>小红书口吻</span>
+              <span>会议纪要</span>
+              <span>自定义词表</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="os-section os-tp7 section-anchor" id="tp7">
+        <div class="container os-tp7-panel reveal">
+          <div class="os-section-copy">
+            <p class="os-section-label">Hardware layer</p>
+            <h2>TP-7 也能变成实体控制器。</h2>
+            <p>TP-7 Vibe Input 是另一个配套项目：把 REC、滚轮、侧边拨杆、Memo 和 Menu 映射成录音、移动光标、清空文本和 Hermes Agent 工作流。</p>
+            <div class="os-hero-actions">
+              <a class="button secondary" href="tp7-vibe-input.html">查看 TP-7 Vibe Input</a>
+              <a class="button secondary" href="downloads/TP7VibeInput-2026-06-23.dmg" download>下载 TP-7 App</a>
+            </div>
+          </div>
+          <img src="assets/tp7-app-overview.jpg?v=20260623" alt="TP-7 Vibe Input 的 3D 映射界面">
+        </div>
+      </section>
+
+      <section class="os-section os-download section-anchor" id="download">
+        <div class="container os-download-panel reveal">
+          <div>
+            <p class="os-section-label">Download</p>
+            <h2>下载完整功能版。</h2>
+            <p>包含本地模型、系统快捷键、提示词后处理、SenseVoice 备选模式和第三方 API 配置。安装包较大，是因为它把本地 AI 能力一起带上了。</p>
+            <div class="os-download-meta">
+              <span>Full Features Original</span>
+              <span>2026-06-18</span>
+              <span>约 6.4 GB</span>
+              <span>免费开源</span>
+            </div>
+            <div class="checksum">
+              <span>SHA256</span>
+              <code>SHA-256 校验文件随 GitHub Release 一并提供</code>
+            </div>
+          </div>
+          <a class="button primary" href="https://github.com/PacoZhou1/open-speech-asr/releases/latest">下载 DMG 分片</a>
         </div>
       </section>
     </main>
@@ -949,8 +292,10 @@
     <footer class="site-footer">
       <div class="container footer-row">
         <span>© 2026 Open Speech ASR</span>
-        <span>粤ICP备2025404473号-2</span>
+        <span>Local AI · Native macOS · 粤ICP备2025404473号-2</span>
       </div>
     </footer>
+
+    <script src="assets/site.js?v=20260626-navfix"></script>
   </body>
 </html>

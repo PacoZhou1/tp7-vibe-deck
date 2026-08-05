@@ -82,15 +82,21 @@ actor Qwen3ASRProvider: ASRProvider {
     private let bundledModelDirectoryName = "qwen3-asr-1.7b-4bit"
     private let sampleRate = 24_000
     private let defaultGlobalSoftLimitMb = 8_000.0
-    private let memoryHardLimitMb = 9_500.0
+    private let memoryHardLimitMb = 9_000.0
     private let initialCacheLimitMb = 256.0
     private let cacheFloorMb = 128.0
     private let cacheHeadroomMb = 512.0
     private var model: Qwen3ASRModel?
-    private var loadTask: Task<Qwen3ASRModel, Error>?
+    private var loadTask: (generation: UInt64, task: Task<Qwen3ASRModel, Error>)?
+    private var loadGeneration: UInt64 = 0
+    private var latestLifecycleGeneration: UInt64 = 0
     private var memoryPolicyConfigured = false
 
-    func warmUp(progressHandler: (@Sendable (Qwen3ASRLoadState) -> Void)? = nil) async throws {
+    func warmUp(
+        lifecycleGeneration: UInt64? = nil,
+        progressHandler: (@Sendable (Qwen3ASRLoadState) -> Void)? = nil
+    ) async throws {
+        try acceptLifecycleRequest(lifecycleGeneration)
         _ = try await loadModel(progressHandler: progressHandler)
     }
 
@@ -184,10 +190,26 @@ actor Qwen3ASRProvider: ASRProvider {
         )
     }
 
-    func releaseModelForMemoryPressure(reason: String) -> LocalMLXCleanupResult {
+    func releaseModelForMemoryPressure(
+        reason: String,
+        lifecycleGeneration: UInt64? = nil
+    ) -> LocalMLXCleanupResult {
         let before = Self.makeMemorySnapshot()
-        loadTask?.cancel()
+        guard acceptReleaseRequest(lifecycleGeneration) else {
+            return LocalMLXCleanupResult(
+                triggered: false,
+                before: before,
+                after: before,
+                targetCacheLimitMb: before.mlxCacheLimitMb,
+                effectiveSoftLimitMb: 0,
+                restartRecommended: false
+            )
+        }
+
+        loadGeneration &+= 1
+        loadTask?.task.cancel()
         loadTask = nil
+        model?.unload()
         model = nil
         Memory.cacheLimit = 0
         Self.synchronizeMLXWork()
@@ -220,10 +242,12 @@ actor Qwen3ASRProvider: ASRProvider {
             progressHandler?(.ready)
             return model
         }
-        if let loadTask {
-            let loaded = try await loadTask.value
-            progressHandler?(.ready)
-            return loaded
+        if let pendingLoad = loadTask {
+            return try await finishLoading(
+                task: pendingLoad.task,
+                generation: pendingLoad.generation,
+                progressHandler: progressHandler
+            )
         }
 
         let bundledModelURL = Self.bundledModelURL(named: bundledModelDirectoryName)
@@ -241,7 +265,9 @@ actor Qwen3ASRProvider: ASRProvider {
                 : .downloading(progress: 0, message: "准备下载 Qwen3-ASR")
         )
         let modelID = self.modelID
-        let task = Task {
+        loadGeneration &+= 1
+        let generation = loadGeneration
+        let task = Task { [weak self] in
             try await Qwen3ASRModel.fromPretrained(
                 modelId: modelID,
                 cacheDir: bundledModelURL,
@@ -257,31 +283,95 @@ actor Qwen3ASRProvider: ASRProvider {
                 } else {
                     state = .ready
                 }
-                progressHandler?(state)
+                Task { [weak self] in
+                    await self?.reportProgress(
+                        state,
+                        generation: generation,
+                        progressHandler: progressHandler
+                    )
+                }
             }
         }
-        loadTask = task
+        loadTask = (generation, task)
+        return try await finishLoading(
+            task: task,
+            generation: generation,
+            progressHandler: progressHandler
+        )
+    }
 
+    private func finishLoading(
+        task: Task<Qwen3ASRModel, Error>,
+        generation: UInt64,
+        progressHandler: (@Sendable (Qwen3ASRLoadState) -> Void)?
+    ) async throws -> Qwen3ASRModel {
         do {
             let loaded = try await task.value
+            guard generation == loadGeneration else {
+                loaded.unload()
+                Self.synchronizeMLXWork()
+                Memory.clearCache()
+                throw CancellationError()
+            }
+
+            let isFirstAdopter = model == nil
             model = loaded
-            loadTask = nil
-            os_log(.info, log: qwenASRLog, "Qwen3-ASR loaded")
-            let cleanup = performMemoryMaintenance(
-                reason: "post-qwen-load",
-                globalSoftLimitMb: defaultGlobalSoftLimitMb,
-                peerTrackedMemoryMb: 0,
-                force: true
-            )
-            logCleanupResult(cleanup, reason: "post-qwen-load")
+            if loadTask?.generation == generation {
+                loadTask = nil
+            }
+            if isFirstAdopter {
+                os_log(.info, log: qwenASRLog, "Qwen3-ASR loaded")
+                let cleanup = performMemoryMaintenance(
+                    reason: "post-qwen-load",
+                    globalSoftLimitMb: defaultGlobalSoftLimitMb,
+                    peerTrackedMemoryMb: 0,
+                    force: true
+                )
+                logCleanupResult(cleanup, reason: "post-qwen-load")
+            }
             progressHandler?(.ready)
             return loaded
         } catch {
-            loadTask = nil
-            os_log(.error, log: qwenASRLog, "Qwen3-ASR load failed: %{public}@", error.localizedDescription)
+            let isCurrentGeneration = generation == loadGeneration
+            if loadTask?.generation == generation {
+                loadTask = nil
+            }
+            guard isCurrentGeneration else {
+                throw CancellationError()
+            }
+            os_log(
+                .error,
+                log: qwenASRLog,
+                "Qwen3-ASR load failed: %{public}@",
+                error.localizedDescription
+            )
             progressHandler?(.failed(error.localizedDescription))
             throw error
         }
+    }
+
+    private func reportProgress(
+        _ state: Qwen3ASRLoadState,
+        generation: UInt64,
+        progressHandler: (@Sendable (Qwen3ASRLoadState) -> Void)?
+    ) {
+        guard generation == loadGeneration else { return }
+        progressHandler?(state)
+    }
+
+    private func acceptLifecycleRequest(_ generation: UInt64?) throws {
+        guard let generation else { return }
+        guard generation >= latestLifecycleGeneration else {
+            throw CancellationError()
+        }
+        latestLifecycleGeneration = generation
+    }
+
+    private func acceptReleaseRequest(_ generation: UInt64?) -> Bool {
+        guard let generation else { return true }
+        guard generation >= latestLifecycleGeneration else { return false }
+        latestLifecycleGeneration = generation
+        return true
     }
 
     private static func bundledModelURL(named directoryName: String) -> URL? {

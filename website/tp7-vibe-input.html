@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TP-7 Vibe Input - Open Speech 的实体控制器</title>
+    <meta name="description" content="TP-7 Vibe Input 把 Teenage Engineering TP-7 变成 Open Speech ASR 的实体录音、文本导航、快捷键和 Hermes 启动控制器。原生 macOS Swift 应用，支持 MIDI 映射、滚轮光标移动和麦克风 warmup。">
+    <meta name="robots" content="index,follow,max-image-preview:large">
+    <meta name="author" content="Open Speech ASR">
+    <meta name="theme-color" content="#f7f7f8">
+    <meta name="color-scheme" content="light">
+    <meta name="keywords" content="TP-7 Vibe Input, Teenage Engineering TP-7, Open Speech ASR, macOS MIDI controller, 语音输入控制器, Hermes Agent, TP-7快捷键">
+    <link rel="canonical" href="https://openspeech.bumiaoai.com/tp7-vibe-input.html">
+    <link rel="icon" href="assets/tp7-vibe-input-icon.png?v=20260623" type="image/png">
+    <link rel="apple-touch-icon" href="assets/tp7-vibe-input-icon.png?v=20260623">
+    <link rel="preload" href="assets/tp7-official-front-1024.webp?v=20260623" as="image">
+    <link rel="stylesheet" href="assets/site.css?v=20260627-mobile-nav">
+    <link rel="stylesheet" href="assets/tp7.css?v=20260627-mobile">
+    <link rel="alternate" type="text/plain" href="llms.txt" title="Open Speech ASR information for AI agents">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Open Speech ASR">
+    <meta property="og:title" content="TP-7 Vibe Input - Open Speech 的实体控制器">
+    <meta property="og:description" content="把 TP-7 变成录音、文本导航、快捷键和 Hermes Agent 的实体控制台。">
+    <meta property="og:image" content="https://openspeech.bumiaoai.com/assets/tp7-vibe-input-icon.png?v=20260623">
+    <meta property="og:image:alt" content="TP-7 Vibe Input app icon">
+    <meta property="og:url" content="https://openspeech.bumiaoai.com/tp7-vibe-input.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="TP-7 Vibe Input - Open Speech 的实体控制器">
+    <meta name="twitter:description" content="用 TP-7 控制 Open Speech、光标、滚动、清空文本和 Hermes Agent。">
+    <meta name="twitter:image" content="https://openspeech.bumiaoai.com/assets/tp7-vibe-input-icon.png?v=20260623">
+    <script>document.documentElement.classList.add("motion-ready");</script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "TP-7 Vibe Input",
+        "applicationCategory": "ProductivityApplication",
+        "operatingSystem": "macOS",
+        "softwareRequirements": "macOS with Accessibility permission, Open Speech ASR, and Teenage Engineering TP-7 in MIDI ctrl mode",
+        "url": "https://openspeech.bumiaoai.com/tp7-vibe-input.html",
+        "downloadUrl": "https://openspeech.bumiaoai.com/downloads/TP7VibeInput-2026-06-23.dmg",
+        "image": "https://openspeech.bumiaoai.com/assets/tp7-vibe-input-icon.png",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+      }
+    </script>
+  </head>
+  <body class="tp7-page">
+    <header class="site-header">
+      <div class="container nav">
+        <a class="brand" href="index.html" aria-label="Paco Works 首页">
+          <img src="assets/icon-open-speech-terminal-nav-20260618.png?v=20260618-nav" alt="Open Speech ASR 图标">
+          <span>Paco Works</span>
+        </a>
+        <nav class="nav-links" aria-label="页面导航">
+          <a href="index.html">Open Speech ASR</a>
+          <a class="current" href="tp7-vibe-input.html">TP-7 Vibe Input</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="tp7-hero section-anchor" id="overview">
+        <div class="container tp7-hero-grid">
+          <div class="reveal">
+            <div class="tp7-kicker">Hardware layer for Open Speech</div>
+            <h1>让 TP-7 成为 Open Speech 的实体输入器。</h1>
+            <p>录音、移动光标、清空文本、启动 Hermes，都可以从这台录音机上完成。TP-7 Vibe Input 是一个原生 macOS Swift 工具，把 TP-7 的 MIDI 控制信号变成真实可用的系统动作。</p>
+            <div class="hero-actions">
+              <a class="button tp7-primary" href="downloads/TP7VibeInput-2026-06-23.dmg" download>下载 TP-7 Vibe Input</a>
+              <a class="button secondary" href="index.html">查看 Open Speech ASR</a>
+            </div>
+            <div class="tp7-release-row">
+              <span>2026-06-23</span>
+              <span>约 29 MB</span>
+              <span>Native macOS Swift</span>
+              <span>TP-7 MIDI ctrl mode</span>
+            </div>
+          </div>
+
+          <figure class="tp7-product-stage reveal" aria-label="TP-7 Vibe Input 产品视觉">
+            <div class="tp7-product-card">
+              <img src="assets/tp7-official-front-1024.webp?v=20260623" alt="Teenage Engineering TP-7 正面产品图">
+            </div>
+            <div class="tp7-callout record">
+              <strong>REC</strong>
+              <span>Hold Open Speech</span>
+            </div>
+            <div class="tp7-callout hermes">
+              <strong>Memo</strong>
+              <span>Launch Hermes</span>
+            </div>
+            <div class="tp7-callout cursor">
+              <strong>Wheel</strong>
+              <span>Cursor / scroll</span>
+            </div>
+            <figcaption>TP-7 product imagery from teenage engineering press assets.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="tp7-section tp7-soft-band section-anchor" id="controls">
+        <div class="container">
+          <div class="tp7-section-head reveal">
+            <h2>不是遥控器 demo，是一套真实的输入链路。</h2>
+            <p>TP-7 的按钮、滚轮和侧边拨杆会被映射成 macOS 系统事件或 Open Speech 行为。你按下的是机器上的实体按钮，触发的是当前前台应用里的真实动作。</p>
+          </div>
+          <div class="tp7-card-grid">
+            <article class="tp7-card reveal">
+              <h3>Open Speech 一键进入</h3>
+              <p>REC 默认长按 Open Speech 收听，松手结束；也可以映射成 toggle 模式，第一次按开始，第二次按停止。</p>
+            </article>
+            <article class="tp7-card reveal">
+              <h3>麦克风保持热身</h3>
+              <p>TP-7 音频输入会保持在线，避免 Open Speech 第一次拉起时等待 USB 音频设备醒来。</p>
+            </article>
+            <article class="tp7-card reveal">
+              <h3>实体文本导航</h3>
+              <p>滚轮可以左右移动光标，侧边拨杆可以连续滚动页面或移动光标，速度支持低、中、高档调节。</p>
+            </article>
+            <article class="tp7-card reveal">
+              <h3>清空与常用快捷键</h3>
+              <p>Menu 可一键清空当前文本，PLAY/STOP、Command-C/V、Return、自定义组合键都可以按你的习惯绑定。</p>
+            </article>
+            <article class="tp7-card reveal">
+              <h3>Hermes 工作流</h3>
+              <p>Memo 短按启动终端里的 Hermes Agent；长按可启动 Hermes 并同时保持 Open Speech 收听，松手结束。</p>
+            </article>
+            <article class="tp7-card reveal">
+              <h3>学习 MIDI 控件</h3>
+              <p>如果某个实体按钮在 TP-7 的 ctrl 模式里发出 MIDI 事件，可以通过 Learn MIDI 捕获并绑定。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="tp7-section section-anchor" id="interface">
+        <div class="container">
+          <div class="tp7-section-head reveal">
+            <h2>从真机到 Mac，输入链路一眼就能看懂。</h2>
+            <p>真实桌面照片负责说明 TP-7 在工作台上的位置，MacBook mockup 展示它在软件里如何变成 3D 控制界面和映射面板。</p>
+          </div>
+          <div class="tp7-interface-hero">
+            <figure class="tp7-macbook reveal">
+              <div class="tp7-macbook-screen">
+                <img src="assets/tp7-app-overview.jpg?v=20260623" alt="TP-7 Vibe Input app overview with 3D device and mapping inspector">
+              </div>
+              <div class="tp7-macbook-base" aria-hidden="true"></div>
+              <figcaption>MacBook mockup: 完整 app 界面，3D 机身、底部控件和右侧映射面板同时展示。</figcaption>
+            </figure>
+            <figure class="tp7-live-photo reveal">
+              <img src="assets/tp7-real-keyboard-web.jpg?v=20260624" alt="TP-7 placed beside a keyboard on a bright desk">
+              <figcaption>真机桌面: TP-7 与键盘放在同一输入工作台，适合录音、编辑和文本导航。</figcaption>
+            </figure>
+          </div>
+          <div class="tp7-interface-grid">
+            <figure class="tp7-shot reveal">
+              <img src="assets/tp7-app-3d-demo.jpg?v=20260623" alt="TP-7 Vibe Input 3D model close-up">
+              <figcaption>3D Demo: 点击底部控件后，视角会聚焦到对应实体按钮。</figcaption>
+            </figure>
+            <figure class="tp7-shot reveal">
+              <img src="assets/tp7-app-mapping-panel.jpg?v=20260623" alt="TP-7 Vibe Input mapping inspector panel">
+              <figcaption>Mapping Inspector: 动作、速度、Learn MIDI、Open Speech 状态集中在右侧。</figcaption>
+            </figure>
+            <figure class="tp7-shot reveal">
+              <img src="assets/tp7-real-desk-web.jpg?v=20260624" alt="TP-7 in a real desk setup with keyboard, mouse, monitor, and headphones">
+              <figcaption>Desk Context: 实体录音机、鼠标、键盘和屏幕组成的真实输入场景。</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="tp7-section section-anchor" id="workflow">
+        <div class="container">
+          <div class="tp7-section-head reveal">
+            <h2>按下机器，说话，文字回到你正在写的地方。</h2>
+            <p>这个 app 不替代 Open Speech，也不改 Open Speech 前端。它只负责把 TP-7 变成更顺手的实体入口。</p>
+          </div>
+          <div class="tp7-flow">
+            <div class="tp7-flow-step reveal">
+              <span>01</span>
+              <h3>TP-7 进入 ctrl</h3>
+              <p>在机器上进入 MIDI，并选择 ctrl，让按钮、滚轮和拨杆开始发控制事件。</p>
+            </div>
+            <div class="tp7-flow-step reveal">
+              <span>02</span>
+              <h3>Vibe Input 常驻</h3>
+              <p>app 保持 TP-7 音频 warmup，并监听 MIDI 输入与权限状态。</p>
+            </div>
+            <div class="tp7-flow-step reveal">
+              <span>03</span>
+              <h3>触发 Open Speech</h3>
+              <p>REC 动态读取 Open Speech 当前快捷键，所以你改快捷键后无需重新构建。</p>
+            </div>
+            <div class="tp7-flow-step reveal">
+              <span>04</span>
+              <h3>回到当前文本</h3>
+              <p>识别、纠错、回填仍由 Open Speech 负责；TP-7 负责让你的手不用离开硬件。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tp7-section tp7-soft-band section-anchor" id="mapping">
+        <div class="container tp7-map-panel">
+          <div class="tp7-map-list reveal" aria-label="默认映射">
+            <div class="tp7-map-item">REC <span>Open Speech Hold</span></div>
+            <div class="tp7-map-item">PLAY <span>Open Speech Toggle</span></div>
+            <div class="tp7-map-item">STOP <span>Return</span></div>
+            <div class="tp7-map-item">Wheel <span>Cursor left / right</span></div>
+            <div class="tp7-map-item">Side rocker <span>Vertical scroll</span></div>
+            <div class="tp7-map-item">Menu <span>Clear Text</span></div>
+            <div class="tp7-map-item">Memo tap <span>Launch Hermes</span></div>
+            <div class="tp7-map-item">Memo hold <span>Hermes + Speech</span></div>
+          </div>
+          <div class="tp7-download-panel reveal" id="setup">
+            <h2>适合已经在用 TP-7 + Open Speech 的人。</h2>
+            <p>首次使用需要给 macOS Accessibility 和 Microphone 权限。TP-7 需要通过 USB 连接，并在机器菜单里选择 MIDI ctrl 模式。</p>
+            <div class="inline-tags">
+              <span>MIDI ctrl</span>
+              <span>Accessibility</span>
+              <span>Microphone</span>
+              <span>Open Speech installed</span>
+            </div>
+            <p class="tp7-note">TP-7 Vibe Input 是独立工具，不是 Teenage Engineering 官方软件。部分功能依赖 TP-7 在当前固件和 ctrl 模式下实际发出的 MIDI 事件。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="download-section section-anchor" id="download">
+        <div class="container download-panel reveal">
+          <div>
+            <h2>下载当前 TP-7 Vibe Input。</h2>
+            <p>包含原生 macOS app、3D 设备映射 UI、Open Speech 快捷键桥接、TP-7 音频 warmup、滚轮和侧边拨杆映射。</p>
+            <div class="checksum tp7-checksum">
+              <span>SHA256</span>
+              <code>d960be0402e1fe4f33b30ccf3cc5bd49ad40cd3936739eca5d7cb919db42eb8e</code>
+            </div>
+            <p class="tp7-note">如果 macOS 提示无法打开，请在系统设置的隐私与安全性里允许当前 app。授权后若权限提示仍停留，重新打开 app 即可刷新状态。</p>
+          </div>
+          <a class="button tp7-primary" href="downloads/TP7VibeInput-2026-06-23.dmg" download>下载 DMG</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-row">
+        <span>© 2026 Open Speech ASR</span>
+        <span>TP-7 Vibe Input · 非官方 TP-7 辅助工具 · 粤ICP备2025404473号-2</span>
+      </div>
+    </footer>
+
+    <script src="assets/site.js?v=20260626-navfix"></script>
+  </body>
+</html>

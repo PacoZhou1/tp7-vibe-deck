@@ -654,15 +654,20 @@ final class AppState: ObservableObject, @unchecked Sendable {
     @Published var asrEngineMode: ASREngineMode {
         didSet {
             guard oldValue != asrEngineMode else { return }
+            asrLifecycleGeneration &+= 1
+            let lifecycleGeneration = asrLifecycleGeneration
             UserDefaults.standard.set(asrEngineMode.rawValue, forKey: asrEngineModeStorageKey)
             isLocalMode = asrEngineMode != .thirdPartyAPI
             customLLMPostProcessingEnabled = asrEngineMode == .thirdPartyAPI
             if asrEngineMode == .qwenNative {
-                warmUpLocalASRModel()
+                warmUpLocalASRModel(lifecycleGeneration: lifecycleGeneration)
             } else {
                 qwen3ASRLoadState = .idle
                 Task { [asrProvider] in
-                    _ = await asrProvider.releaseModelForMemoryPressure(reason: "mode-switched-away-from-qwen")
+                    _ = await asrProvider.releaseModelForMemoryPressure(
+                        reason: "mode-switched-away-from-qwen",
+                        lifecycleGeneration: lifecycleGeneration
+                    )
                 }
             }
             NotificationCenter.default.post(name: .localBackendModeChanged, object: nil)
@@ -714,9 +719,12 @@ final class AppState: ObservableObject, @unchecked Sendable {
     private var capturedContext: AppContext?
     private var hasShownScreenshotPermissionAlert = false
     private var audioDeviceObservers: [NSObjectProtocol] = []
+    private var tp7PresetObserver: NSObjectProtocol?
     private var needsMicrophoneRefreshAfterRecording = false
     private let pipelineHistoryStore = PipelineHistoryStore()
     private let asrProvider = Qwen3ASRProvider.shared
+    private var asrLifecycleGeneration: UInt64 = 0
+    private var localBackendSessionToken = ""
     private let shortcutSessionController = DictationShortcutSessionController()
     private var activeRecordingTriggerMode: RecordingTriggerMode?
     private var currentSessionIntent: SessionIntent = .dictation
@@ -736,6 +744,7 @@ final class AppState: ObservableObject, @unchecked Sendable {
     private var pendingMicrophonePermissionManualCommandRequested: Bool?
     private let postTranscriptionUpdateReminderDuration: TimeInterval = 7
     private var isUpdatingLaunchAtLoginFromSystem = false
+    private static let tp7PresetNotification = Notification.Name("com.paco.TP7VibeInput.openSpeechPresetChanged")
 
     var shouldRunLocalGemmaBackend: Bool {
         asrEngineMode == .qwenNative || asrEngineMode == .senseVoiceGemma
@@ -994,24 +1003,34 @@ final class AppState: ObservableObject, @unchecked Sendable {
 
         // Clear any stale recording flag left over from an unclean exit.
         AppState.writeRecordingStateFlag(false)
+        startTP7PresetBridge()
         setLaunchAtLogin(launchAtLogin)
     }
 
-    func warmUpLocalASRModel() {
+    func warmUpLocalASRModel(lifecycleGeneration: UInt64? = nil) {
         guard asrEngineMode == .qwenNative else { return }
+        let requestedGeneration = lifecycleGeneration ?? asrLifecycleGeneration
         Task { [weak self] in
             do {
                 guard let self else { return }
-                try await self.asrProvider.warmUp { state in
+                try await self.asrProvider.warmUp(lifecycleGeneration: requestedGeneration) { state in
                     Task { @MainActor in
+                        guard self.asrEngineMode == .qwenNative,
+                              self.asrLifecycleGeneration == requestedGeneration else { return }
                         self.qwen3ASRLoadState = state
                     }
                 }
             } catch {
+                if error is CancellationError {
+                    return
+                }
                 let message = error.localizedDescription
                 await MainActor.run { [weak self] in
-                    self?.qwen3ASRLoadState = .failed(message)
-                    self?.errorMessage = "Qwen3-ASR 启动失败：\(message)"
+                    guard let self,
+                          self.asrEngineMode == .qwenNative,
+                          self.asrLifecycleGeneration == requestedGeneration else { return }
+                    self.qwen3ASRLoadState = .failed(message)
+                    self.errorMessage = "Qwen3-ASR 启动失败：\(message)"
                 }
             }
         }
@@ -1019,6 +1038,10 @@ final class AppState: ObservableObject, @unchecked Sendable {
 
     func localASRMemorySnapshot() async -> LocalMLXMemorySnapshot {
         await asrProvider.memorySnapshot()
+    }
+
+    func configureLocalBackendSession(token: String) {
+        localBackendSessionToken = token
     }
 
     func performLocalASRMemoryMaintenance(
@@ -1044,8 +1067,29 @@ final class AppState: ObservableObject, @unchecked Sendable {
     }
 
     deinit {
+        if let tp7PresetObserver {
+            DistributedNotificationCenter.default().removeObserver(tp7PresetObserver)
+        }
         removeAudioDeviceObservers()
         AppState.writeRecordingStateFlag(false)
+    }
+
+    private func startTP7PresetBridge() {
+        guard tp7PresetObserver == nil else { return }
+        tp7PresetObserver = DistributedNotificationCenter.default().addObserver(
+            forName: Self.tp7PresetNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            let rawPreset = notification.userInfo?["preset"] as? String
+                ?? notification.object as? String
+                ?? UserDefaults.standard.string(forKey: self?.selectedSystemPromptPresetStorageKey ?? "")
+            guard let rawPreset,
+                  let preset = SystemPromptPreset(rawValue: rawPreset) else {
+                return
+            }
+            self?.applySystemPromptPreset(preset)
+        }
     }
 
     private func removeAudioDeviceObservers() {
@@ -1311,7 +1355,10 @@ final class AppState: ObservableObject, @unchecked Sendable {
             }
             return result.text
         case .senseVoiceGemma:
-            return try await LocalBackendClient.transcribe(fileURL: fileURL)
+            return try await LocalBackendClient.transcribe(
+                fileURL: fileURL,
+                sessionToken: localBackendSessionToken
+            )
         case .thirdPartyAPI:
             let service = try makeTranscriptionService()
             return try await service.transcribe(fileURL: fileURL)
@@ -2828,7 +2875,8 @@ final class AppState: ObservableObject, @unchecked Sendable {
                     text: commandInput,
                     customPrompt: PostProcessingService.commandModeSystemPrompt,
                     customVocabulary: customVocabulary,
-                    context: context.contextSummary
+                    context: context.contextSummary,
+                    sessionToken: localBackendSessionToken
                 )
                 return (
                     result.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -2861,7 +2909,8 @@ final class AppState: ObservableObject, @unchecked Sendable {
                 text: trimmedRawTranscript,
                 customPrompt: systemPrompt,
                 customVocabulary: customVocabulary,
-                context: context.contextSummary
+                context: context.contextSummary,
+                sessionToken: localBackendSessionToken
             )
             return (
                 result.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -3081,7 +3130,10 @@ final class AppState: ObservableObject, @unchecked Sendable {
                             self?.statusText = "Preparing SenseVoice..."
                             self?.debugStatusMessage = "Running SenseVoice ASR"
                         }
-                        let asrText = try await LocalBackendClient.transcribe(fileURL: transcriptionFileURL)
+                        let asrText = try await LocalBackendClient.transcribe(
+                            fileURL: transcriptionFileURL,
+                            sessionToken: self.localBackendSessionToken
+                        )
                         rawTranscript = asrText
                         parsedTranscript = Self.parseTranscriptCommands(
                             from: rawTranscript,
